@@ -58,7 +58,7 @@ The following technologies will be used:
 
 * HTML5 <canvas/> - the new canvas element in HTML5 provides a native, high-performing and reliable method for implementing graphics on a web page. An HTML5 element would be placed on top of the Google map element.
 
-* An HTML5/JS drawing plugin (not yet specified)
+* Litteraly Canvas HTML5/JS canvas widget plugin
 
 * Backbone.js - an MVC web application platform.
 
