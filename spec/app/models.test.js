@@ -52,6 +52,11 @@ describe('Models', function() {
             expect(schema.shapes.caster.instance).to.equal('ObjectID');
         });
 
+        it('should have a stories array of ids', function() {
+            expect(schema.stories).to.exist;
+            expect(schema.stories.caster.instance).to.equal('ObjectID');
+        });
+
     });
 
     describe('Shape', function() {
@@ -80,11 +85,11 @@ describe('Models', function() {
 
     });
 
-    describe('StoryBoard', function() {
-        var schema = models.Storyboard.schema.paths;
+    describe('Story', function() {
+        var schema = models.Story.schema.paths;
 
         it('should exist', function() {
-            expect(models.Storyboard).to.exist;
+            expect(models.Story).to.exist;
         });
 
         it('should have a _id string', function() {

@@ -17,7 +17,8 @@ var Map = new Schema({
 
 var Canvas = new Schema({
     _id: Schema.ObjectId,
-    shapes: { type: [Schema.ObjectId], default: [] }
+    shapes: { type: [Schema.ObjectId], default: [] },
+    stories: { type: [Schema.ObjectId], default: [] }
 });
 
 var Shape = new Schema({
@@ -35,7 +36,7 @@ var Shape = new Schema({
     timestamp: { type: Date, 'default': Date.now }
 });
 
-var Storyboard = new Schema({
+var Story = new Schema({
     _id: Schema.ObjectId,
     name: String,
     story: String,
@@ -50,5 +51,5 @@ module.exports = {
     Map: mongoose.model('Map', Map),
     Canvas: mongoose.model('Canvas', Canvas),
     Shape: mongoose.model('Shape', Shape),
-    Storyboard: mongoose.model('Storyboard', Storyboard)
+    Story: mongoose.model('Story', Story)
 };
