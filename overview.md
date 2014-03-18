@@ -12,27 +12,37 @@ Curator => The organiser of an exhibition, who will have control over the large-
 
 A platform that allows ehibition visitors to take part in creating a map of a given area. Visitors will use touch-screen kiosks to explore a map and styli to draw onto the map.
 
-A projector or large screen will also be present in the exhibition area showing an overview of the map, updated in real-time as visitors add to it. This view of the map could also display an animated timeline of how the map has built up over the course of the exhibition.
+Visitors may also place pins on the map and attach short pieces of text to the pins.
+
+A projector or large screen will also be present in the exhibition area showing an overview of the map, updated in real-time as visitors add to it. This view of the map will also display an animated timeline of how the map has built up over the course of the exhibition.
+
+
+
+The map and the map timeline will also be accessible via the web, meaning that visitors don't need to be present in the exhibition space to see that map and read the pin stories
 
 ## Specification
 
 The platform will consist of the following:
 
-### The MapDrawView
+### The MapInteractView
 
-This will be the only view that is used within the mobile app. Visitors will be able to zoom in and out of the map.
+This will be the only view that is used within the mobile app, and only accessible at the exhibition. Visitors will be able to zoom in and out of the map.
 
 When they are zoomed right in, a 'Draw' button will appear. When the visitor presses the Draw button, this will put the view into Draw Mode and the visitor will be able to draw onto the map using a stylus or their fingers. Zooming and panning the map will be disabled in Draw Mode. A toolbar will also appear, allowing them to change the brush colour and width. When they are finished, they can press 'Done' and they will be taken out of Draw Mode and will able to pan and zoom the map once again.
 
 The canvas will be slightly translucent so that the map will still be visible underneath the drawings.
 
-While in draw mode, 'Stylus Up' interactions will trigger other clients' view canvases to update. This means that when a user finishes drawing a line, the other kiosks views of the map will be updated with that line.
+While in draw mode, 'Stylus Up' interactions will trigger other clients' view canvases to update. This means that when a user finishes drawing a line, other people viewing the map will be updated with that line.
 
 A visitor will be able to erase what they are drawing, but once they tap 'Done' they will not be able to change what they've drawn.
+
+In this view, visitors will also be able to explore the story pins and read the stories attached to them. They will also be able to drop their own story pins
 
 ### The MapViewView
 
 This will be a fullscreen, zoomed out view of the map, updating in real-time as visitors draw onto it.
+
+On the website, it will be zoomable and visitors will be able to view story pins and read the stories attached to them.
 
 ### The MapTimelineView
 
