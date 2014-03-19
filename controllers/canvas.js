@@ -5,7 +5,13 @@ module.exports = {
 
     //},
     getById: function(req, res) {
-        
+        models.Canvas.find({ _id: req.params.id }, function(err, map) {
+            if (err) {
+                res.json({err: 'Canvas not found'});
+            } else {
+                res.json(map);
+            }
+        });
     }
     //add: function(req, res) {
 

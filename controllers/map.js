@@ -5,15 +5,13 @@ module.exports = {
 
     //},
     getById: function(req, res) {
-        /*
         models.Map.find({ _id: req.params.id }, function(err, map) {
             if (err) {
-                res.json({err: "Map not found"})
+                res.json({err: 'Map not found'})
             } else {
                 res.json(map);
             }
-        })
-        */
+        });
     }
     //add: function(req, res) {
 
