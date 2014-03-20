@@ -16,12 +16,6 @@ describe('Map Controller', function() {
 			json: sinon.spy()
 		};
 
-		req = {
-			params: {
-				id: 1234
-			}
-		};
-
 		modelsStub.Map = {
 			find: function(query, callback) {
 				callback(null, map);
@@ -40,6 +34,14 @@ describe('Map Controller', function() {
 	// Get ID
 
 	describe('getById', function() {
+
+		beforeEach(function() {
+			req = {
+				params: {
+					id: 1234
+				}
+			};
+		});
 
 		it('should be defined', function() {
 			expect(map.getById).to.be.a('function');

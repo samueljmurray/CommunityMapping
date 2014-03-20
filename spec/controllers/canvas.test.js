@@ -16,12 +16,6 @@ describe('Canvas Controller', function() {
 			json: sinon.spy()
 		};
 
-		req = {
-			params: {
-				id: 1234
-			}
-		};
-
 		modelsStub.Canvas = {
 			find: function(query, callback) {
 				callback(null, canvas);
@@ -40,6 +34,14 @@ describe('Canvas Controller', function() {
 	// Get ID
 
 	describe('getById', function() {
+
+		beforeEach(function() {
+			req = {
+				params: {
+					id: 1234
+				}
+			};
+		});
 
 		it('should be defined', function() {
 			expect(canvas.getById).to.be.a('function');
