@@ -1,6 +1,7 @@
 var express = require('express'),
     http = require('http'),
     path = require('path'),
+    utils = require('./utils'),
     routes = require('./app/routes'),
     exphbs = require('express3-handlebars'),
     mongoose = require('mongoose'),
@@ -30,7 +31,7 @@ if ('development' == app.get('env')) {
 // DB connect
 mongoose.connect('mongodb://localhost/CommunityMapping');
 mongoose.connection.on('open', function() {
-    console.log("Connected to Mongoose...");
+    utils.log.info("Connected to Mongoose");
 });
 
 // Routes
@@ -38,5 +39,5 @@ routes.initialize(app);
 
 // Start server
 http.createServer(app).listen(app.get('port'), function() {
-    console.log('Server up: http://localhost:' + app.get('port'));
+    utils.log.info('Server up: http://localhost:' + app.get('port'));
 });

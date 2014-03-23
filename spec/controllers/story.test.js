@@ -13,7 +13,8 @@ describe('Story Controller', function() {
 	// Setup
 	beforeEach(function() {
 		res = {
-			json: sinon.spy()
+			json: sinon.spy(),
+			send: sinon.spy()
 		};
 
 		modelsStub.Story = {
@@ -77,14 +78,27 @@ describe('Story Controller', function() {
 			expect(res.json).calledWith(story);
 		});
 
-		it('should return json error on error', function() {
+		it('should return 404 when story not found', function() {
 			modelsStub.Story = {
 				findOne: function(query, callback) {
-					callback({err: 'Story not found'});
+					callback({
+						name: 'CastError',
+						type: 'ObjectId'
+					}, null)
 				}
 			};
 			story.getById(req, res);
-			expect(res.json).calledWith({err: 'Story not found'});
+			expect(res.send).calledWith(404);
+		});
+
+		it('should return 500 on other error', function() {
+			modelsStub.Story = {
+				findOne: function(query, callback) {
+					callback({}, null)
+				}
+			};
+			story.getById(req, res);
+			expect(res.send).calledWith(500);
 		});
 
 	});

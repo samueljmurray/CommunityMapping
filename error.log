@@ -1,0 +1,7 @@
+{"level":"info","message":"Server up: http://localhost:3300","timestamp":"2014-03-23T11:03:19.369Z"}
+{"level":"info","message":"Connected to Mongoose","timestamp":"2014-03-23T11:03:19.384Z"}
+{"level":"info","message":"Server up: http://localhost:3300","timestamp":"2014-03-23T11:03:33.597Z"}
+{"level":"info","message":"Connected to Mongoose","timestamp":"2014-03-23T11:03:33.612Z"}
+{"level":"info","message":"Server up: http://localhost:3300","timestamp":"2014-03-23T11:03:48.849Z"}
+{"level":"info","message":"Connected to Mongoose","timestamp":"2014-03-23T11:03:48.864Z"}
+{"message":"Story.getById 404 Cast to ObjectId failed for value \"1\" at path \"_id\"","name":"CastError","type":"ObjectId","value":"1","path":"_id","level":"warn","timestamp":"2014-03-23T11:04:32.562Z"}

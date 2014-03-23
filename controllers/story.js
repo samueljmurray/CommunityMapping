@@ -26,7 +26,13 @@ module.exports = {
     getById: function(req, res) {
         models.Story.findOne({ _id: req.params.id }, function(err, story) {
             if (err) {
-                res.json({err: 'Story not found'})
+                if (err.name === 'CastError' && err.type === 'ObjectId') {
+                    utils.log.warn('Story.getById 404', err.message, err);
+                    res.send(404);
+                } else {
+                    utils.log.error('Story.getById 500', err.message, err);
+                    res.send(500);
+                }
             } else {
                 res.json(story);
             }

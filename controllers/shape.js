@@ -26,7 +26,13 @@ module.exports = {
     getById: function(req, res) {
         models.Shape.findOne({ _id: req.params.id }, function(err, shape) {
             if (err) {
-                res.json({err: 'Shape not found'})
+                if (err.name === 'CastError' && err.type === 'ObjectId') {
+                    utils.log.warn('Shape.getById 404', err.message, err);
+                    res.send(404);
+                } else {
+                    utils.log.error('Shape.getById 500', err.message, err);
+                    res.send(500);
+                }
             } else {
                 res.json(shape);
             }

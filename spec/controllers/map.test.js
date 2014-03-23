@@ -13,7 +13,8 @@ describe('Map Controller', function() {
 	// Setup
 	beforeEach(function() {
 		res = {
-			json: sinon.spy()
+			json: sinon.spy(),
+			send: sinon.spy()
 		};
 
 		modelsStub.Map = {
@@ -77,14 +78,27 @@ describe('Map Controller', function() {
 			expect(res.json).calledOnce;
 		});
 
-		it('should return json error on error', function() {
+		it('should return 404 when map not found', function() {
 			modelsStub.Map = {
 				findOne: function(query, callback) {
-					callback(null, {err: 'Map not found'})
+					callback({
+						name: 'CastError',
+						type: 'ObjectId'
+					}, null)
 				}
 			};
 			map.getById(req, res);
-			expect(res.json).calledWith({err: 'Map not found'})
+			expect(res.send).calledWith(404);
+		});
+
+		it('should return 500 on other error', function() {
+			modelsStub.Map = {
+				findOne: function(query, callback) {
+					callback({}, null)
+				}
+			};
+			map.getById(req, res);
+			expect(res.send).calledWith(500);
 		});
 
 	});

@@ -13,7 +13,8 @@ describe('Shape Controller', function() {
 	// Setup
 	beforeEach(function() {
 		res = {
-			json: sinon.spy()
+			json: sinon.spy(),
+			send: sinon.spy()
 		};
 
 		modelsStub.Shape = {
@@ -77,14 +78,27 @@ describe('Shape Controller', function() {
 			expect(res.json).calledOnce;
 		});
 
-		it('should return json error on error', function() {
+		it('should return 404 when shape not found', function() {
 			modelsStub.Shape = {
 				findOne: function(query, callback) {
-					callback(null, {err: 'Shape not found'})
+					callback({
+						name: 'CastError',
+						type: 'ObjectId'
+					}, null)
 				}
 			};
 			shape.getById(req, res);
-			expect(res.json).calledWith({err: 'Shape not found'})
+			expect(res.send).calledWith(404);
+		});
+
+		it('should return 500 on other error', function() {
+			modelsStub.Shape = {
+				findOne: function(query, callback) {
+					callback({}, null)
+				}
+			};
+			shape.getById(req, res);
+			expect(res.send).calledWith(500);
 		});
 
 	});

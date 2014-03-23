@@ -26,7 +26,13 @@ module.exports = {
     getById: function(req, res) {
         models.Map.findOne({ _id: req.params.id }, function(err, map) {
             if (err) {
-                res.json({err: 'Map not found'})
+                if (err.name === 'CastError' && err.type === 'ObjectId') {
+                    utils.log.warn('Map.getById 404', err.message, err);
+                    res.send(404);
+                } else {
+                    utils.log.error('Map.getById 500', err.message, err);
+                    res.send(500);
+                }
             } else {
                 res.json(map);
             }

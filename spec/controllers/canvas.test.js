@@ -13,7 +13,8 @@ describe('Canvas Controller', function() {
 	// Setup
 	beforeEach(function() {
 		res = {
-			json: sinon.spy()
+			json: sinon.spy(),
+			send: sinon.spy()
 		};
 
 		modelsStub.Canvas = {
@@ -77,14 +78,27 @@ describe('Canvas Controller', function() {
 			expect(res.json).calledOnce;
 		});
 
-		it('should return json error on error', function() {
+		it('should return 404 when canvas not found', function() {
 			modelsStub.Canvas = {
 				findOne: function(query, callback) {
-					callback(null, {err: 'Canvas not found'})
+					callback({
+						name: 'CastError',
+						type: 'ObjectId'
+					}, null)
 				}
 			};
 			canvas.getById(req, res);
-			expect(res.json).calledWith({err: 'Canvas not found'})
+			expect(res.send).calledWith(404);
+		});
+
+		it('should return 500 on other error', function() {
+			modelsStub.Canvas = {
+				findOne: function(query, callback) {
+					callback({}, null)
+				}
+			};
+			canvas.getById(req, res);
+			expect(res.send).calledWith(500);
 		});
 
 	});

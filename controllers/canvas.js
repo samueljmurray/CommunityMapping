@@ -26,7 +26,13 @@ module.exports = {
     getById: function(req, res) {
         models.Canvas.findOne({ _id: req.params.id }, function(err, canvas) {
             if (err) {
-                res.json({err: 'Canvas not found'});
+                if (err.name === 'CastError' && err.type === 'ObjectId') {
+                    utils.log.warn('Canvas.getById 404', err.message, err);
+                    res.send(404);
+                } else {
+                    utils.log.error('Canvas.getById 500', err.message, err);
+                    res.send(500);
+                }
             } else {
                 res.json(canvas);
             }
