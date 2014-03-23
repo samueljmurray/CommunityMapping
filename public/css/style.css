@@ -1,0 +1,33 @@
+html {
+	font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing:anti-aliased;
+	color:#3A3A3A;
+}
+
+h3 {
+	margin-top:25px;
+	padding-bottom:5px;
+	border-bottom:1px solid #E2E2E2;
+}
+
+ul {
+	list-style:none;
+}
+
+dt {
+	margin-top:10px;
+}
+
+dd {
+	margin-top:5px;
+}
+
+.code {
+	font-family:Consolas, Courier New, monospace;
+}
+
+.admin-container {
+	max-width:950px;
+	padding:0px 5px;
+	margin:0px auto;
+}
