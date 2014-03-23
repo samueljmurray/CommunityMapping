@@ -133,23 +133,23 @@ describe('Shape Controller', function() {
 			req.body = {
 				data: {
 					order: 1,
-			        tailSize: 2,
-			        points: [{
-			            x: 3,
-			            y: 4,
-			            size: 5,
-			            color: '#000000'
-			        }, {
-			            x: 6,
-			            y: 7,
-			            size: 8,
-			            color: '#A3E7F2'
-			        }, {
-			            x: 9,
-			            y: 10,
-			            size: 11,
-			            color: '#FF0000'
-			        }]
+					tailSize: 2,
+					points: [{
+						x: 3,
+						y: 4,
+						size: 5,
+						color: '#000000'
+					}, {
+						x: 6,
+						y: 7,
+						size: 8,
+						color: '#A3E7F2'
+					}, {
+						x: 9,
+						y: 10,
+						size: 11,
+						color: '#FF0000'
+					}]
 				},
 				timestamp: 1395306034983
 			};
