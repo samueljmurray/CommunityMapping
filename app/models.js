@@ -3,13 +3,12 @@ var mongoose = require('mongoose'),
     ObjectId = Schema.ObjectId;
 
 var Map = new Schema({
-    _id: Schema.ObjectId,
     timestamp: { type: Date, 'default': Date.now },
     coordinates: {
         lat: String,
         lng: String
     },
-    canvasID: String,
+    canvasId: Schema.ObjectId,
     style: {
         bgcolor: String,
         fgcolor: String
@@ -17,13 +16,11 @@ var Map = new Schema({
 });
 
 var Canvas = new Schema({
-    _id: Schema.ObjectId,
     shapes: { type: [Schema.ObjectId], default: [] },
     stories: { type: [Schema.ObjectId], default: [] }
 });
 
 var Shape = new Schema({
-    _id: Schema.ObjectId,
     data: {
         order: Number,
         tailSize: Number,
@@ -38,7 +35,6 @@ var Shape = new Schema({
 });
 
 var Story = new Schema({
-    _id: Schema.ObjectId,
     title: String,
     story: String,
     timestamp: { type: Date, 'default': Date.now },
