@@ -17,8 +17,11 @@ describe('Shape Controller', function() {
 		};
 
 		modelsStub.Shape = {
-			find: function(query, callback) {
-				callback(null, map);
+			find: function(query, fields, options, callback) {
+				callback(null, {});
+			},
+			findOne: function(query, callback) {
+				callback(null, {});
 			},
 			save: function(err, callback) {
 				callback(null, req.body);
@@ -31,8 +34,30 @@ describe('Shape Controller', function() {
 		expect(shape).to.exist;
 	});
 
-	// Get ID
+	// Index
+	describe('index', function() {
 
+		beforeEach(function() {
+			req = {
+				params: {
+					page: 1,
+					max: undefined
+				}
+			};
+		});
+
+		it('should be defined', function() {
+			expect(shape.index).to.be.a('function');
+		});
+
+		it('should return json', function() {
+			shape.index(req,res);
+			expect(res.json).calledOnce;
+		});
+
+	});
+
+	// Get ID
 	describe('getById', function() {
 
 		beforeEach(function() {
@@ -49,12 +74,12 @@ describe('Shape Controller', function() {
 
 		it('should return json on success', function() {
 			shape.getById(req, res);
-			expect(res.json).calledWith(shape);
+			expect(res.json).calledOnce;
 		});
 
 		it('should return json error on error', function() {
 			modelsStub.Shape = {
-				find: function(query, callback) {
+				findOne: function(query, callback) {
 					callback(null, {err: 'Shape not found'})
 				}
 			};
@@ -70,7 +95,9 @@ describe('Shape Controller', function() {
 			req = {
 				params: {
 					start: 1395306023878,
-					end: 1395306034983
+					end: 1395306034983,
+					page: 1,
+					max: undefined
 				}
 			};
 		});
@@ -81,17 +108,7 @@ describe('Shape Controller', function() {
 
 		it('should return json on success', function() {
 			shape.getByTimerange(req, res);
-			expect(res.json).calledWith(shape);
-		});
-
-		it('should return json error on error', function() {
-			modelsStub.Shape = {
-				find: function(query, callback) {
-					callback(null, {err: 'No shapes found'})
-				}
-			};
-			shape.getByTimerange(req, res);
-			expect(res.json).calledWith({err: 'No shapes found'})
+			expect(res.json).calledOnce;
 		});
 
 	});
@@ -145,14 +162,14 @@ describe('Shape Controller', function() {
 		it('should return error on failed save', function() {
 
 			modelsStub.Shape = sinon.spy(function() {
-                modelsStub.Contact.prototype.save = function(callback) {
+                modelsStub.Shape.prototype.save = function(callback) {
                     callback({}, req.body);
                 };
                 return;
             });
 
             shape.add(req, res);
-            expect(res.json).calledWith({err: 'Error saving shape'});
+            expect(res.json).calledWith({err: 'Error adding shape'});
 
 		});
 

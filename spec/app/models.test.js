@@ -97,9 +97,9 @@ describe('Models', function() {
             expect(schema._id.instance).to.equal('ObjectID');
         });
 
-        it('should have a name string', function() {
-            expect(schema.name).to.exist;
-            expect(schema.name.instance).to.equal('String');
+        it('should have a title string', function() {
+            expect(schema.title).to.exist;
+            expect(schema.title.instance).to.equal('String');
         });
 
         it('should have a story string', function() {

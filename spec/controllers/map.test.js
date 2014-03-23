@@ -17,8 +17,11 @@ describe('Map Controller', function() {
 		};
 
 		modelsStub.Map = {
-			find: function(query, callback) {
-				callback(null, map);
+			find: function(query, fields, options, callback) {
+				callback(null, {});
+			},
+			findOne: function(query, callback) {
+				callback(null, {});
 			},
 			save: function(err, callback) {
 				callback(null, req.body);
@@ -31,8 +34,30 @@ describe('Map Controller', function() {
 		expect(map).to.exist;
 	});
 
-	// Get ID
+	// Index
+	describe('index', function() {
 
+		beforeEach(function() {
+			req = {
+				params: {
+					page: 1,
+					max: undefined
+				}
+			};
+		});
+
+		it('should be defined', function() {
+			expect(map.index).to.be.a('function');
+		});
+
+		it('should return json', function() {
+			map.index(req, res);
+			expect(res.json).calledOnce;
+		});
+
+	});
+
+	// Get ID
 	describe('getById', function() {
 
 		beforeEach(function() {
@@ -49,12 +74,12 @@ describe('Map Controller', function() {
 
 		it('should return json on success', function() {
 			map.getById(req, res);
-			expect(res.json).calledWith(map);
+			expect(res.json).calledOnce;
 		});
 
 		it('should return json error on error', function() {
 			modelsStub.Map = {
-				find: function(query, callback) {
+				findOne: function(query, callback) {
 					callback(null, {err: 'Map not found'})
 				}
 			};

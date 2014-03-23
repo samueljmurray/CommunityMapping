@@ -17,8 +17,11 @@ describe('Canvas Controller', function() {
 		};
 
 		modelsStub.Canvas = {
-			find: function(query, callback) {
-				callback(null, canvas);
+			find: function(query, fields, options, callback) {
+				callback(null, {});
+			},
+			findOne: function(query, callback) {
+				callback(null, {});
 			},
 			save: function(err, callback) {
 				callback(null, req.body);
@@ -31,8 +34,30 @@ describe('Canvas Controller', function() {
 		expect(canvas).to.exist;
 	});
 
-	// Get ID
+	// Index
+	describe('index', function() {
 
+		beforeEach(function() {
+			req = {
+				params: {
+					page: 1,
+					max: undefined
+				}
+			};
+		});
+
+		it('should be defined', function() {
+			expect(canvas.index).to.be.a('function');
+		});
+
+		it('should return json', function() {
+			canvas.index(req,res);
+			expect(res.json).calledOnce;
+		});
+
+	});
+
+	// Get ID
 	describe('getById', function() {
 
 		beforeEach(function() {
@@ -49,12 +74,12 @@ describe('Canvas Controller', function() {
 
 		it('should return json on success', function() {
 			canvas.getById(req, res);
-			expect(res.json).calledWith(canvas);
+			expect(res.json).calledOnce;
 		});
 
 		it('should return json error on error', function() {
 			modelsStub.Canvas = {
-				find: function(query, callback) {
+				findOne: function(query, callback) {
 					callback(null, {err: 'Canvas not found'})
 				}
 			};
