@@ -2,6 +2,7 @@ var express = require('express'),
     http = require('http'),
     path = require('path'),
     utils = require('./utils'),
+    seeder = require('./app/seeder'),
     routes = require('./app/routes'),
     exphbs = require('express3-handlebars'),
     mongoose = require('mongoose'),
@@ -32,6 +33,8 @@ if ('development' == app.get('env')) {
 mongoose.connect('mongodb://localhost/CommunityMapping');
 mongoose.connection.on('open', function() {
     utils.log.info("Connected to Mongoose");
+
+    seeder.check();
 });
 
 // Routes
