@@ -12,7 +12,7 @@ app.set('port', process.env.PORT || 3300);
 app.set('views', __dirname + '/views');
 app.engine('handlebars', exphbs({
     defaultLayout: 'main',
-    layoutsDir: app.get('views') + '/layouts'
+    layoutsDir: app.get('views')
 }));
 app.set('view engine', 'handlebars');
 
