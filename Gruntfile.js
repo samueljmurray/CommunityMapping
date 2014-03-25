@@ -245,5 +245,5 @@ module.exports = function(grunt) {
     grunt.registerTask('test:client', ['karma:test']);
     grunt.registerTask('tdd', ['karma:watcher:start', 'concurrent:test']);
 
-    grunt.registerTask('test', ['test:server'/*, 'test:client'*/]);
+    grunt.registerTask('test', ['test:server', 'test:client']);
 };

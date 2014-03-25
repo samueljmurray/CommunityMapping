@@ -22,9 +22,9 @@ describe('Models', function() {
             expect(schema['coordinates.lng'].instance).to.equal('String');
         });
 
-        it('should have a canvas ID string', function() {
-            expect(schema.canvasID).to.exist;
-            expect(schema.canvasID.instance).to.equal('String');
+        it('should have a canvas Id string', function() {
+            expect(schema.canvasId).to.exist;
+            expect(schema.canvasId.instance).to.equal('ObjectID');
         });
 
         it('should have a style object', function() {
