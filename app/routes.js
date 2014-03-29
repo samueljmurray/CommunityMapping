@@ -9,7 +9,7 @@ module.exports.initialize = function(app) {
     app.get('/', home.index);
 
     // Map routes
-    app.get('/api/map/index/:page/:max?', map.index);
+    app.get('/api/map/index', map.index);
     app.get('/api/map/:id', map.getById);
     //app.post('/api/maps', maps.add);
     //app.put('/api/maps', maps.update);

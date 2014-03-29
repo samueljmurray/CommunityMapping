@@ -31,9 +31,9 @@ describe('App', function() {
 var Marionette = require('backbone.marionette'),
 	utils = require('./utils'),
     Controller = require('./controller'),
-    Router = require('./router');
-    //MapModel = require('./models/map'),
-    //MapCollection = require('./collections/map');
+    Router = require('./router'),
+    MapModel = require('./models/map'),
+    MapCollection = require('./collections/maps');
 
 // Define and export App
 module.exports = App = function App() {};
@@ -47,16 +47,14 @@ App.prototype.start = function() {
         App.views = {};
         App.data = {};
 
-        // load up some initial data:
-        //var maps = new MapsCollection();
-        //maps.fetch({
-        //    success: function() {
-        //        App.data.maps = maps;
-        //        App.core.vent.trigger('app:start');
-        //    }
-        //});
-
-		App.core.vent.trigger('app:start');
+        // Load maps
+        var maps = new MapsCollection();
+        maps.fetch({
+            success: function() {
+                App.data.maps = maps;
+                App.core.vent.trigger('app:start');
+            }
+        });
 
     });
 
@@ -77,13 +75,27 @@ App.prototype.start = function() {
 
     App.core.start();
 };
-},{"./controller":3,"./router":4,"./utils":5}],3:[function(require,module,exports){
-var Marionette = require('backbone.marionette'),
-	utils = require('./utils'),
-	HomeView = require('./views/home');
+},{"./collections/maps":3,"./controller":4,"./models/map":5,"./router":6,"./utils":7}],3:[function(require,module,exports){
+var Backbone = require('backbone'),
+    ContactModel = require('../models/map');
+
+module.exports = MapsCollection = Backbone.Collection.extend({
+	initialize: function(page) {
+		this.url = '/api/map/index';
+	},
+	model: MapModel
+});
+},{"../models/map":5}],4:[function(require,module,exports){
+var Backbone = require('backbone'),
+	Marionette = require('backbone.marionette'),
+    utils = require('./utils'),
+    NotFoundView = require('./views/notfound'),
+    HomeView = require('./views/home'),
+    MapsView = require('./views/maps'),
+    MapAddView = require('./views/mapadd');
 
 module.exports = Controller = Marionette.Controller.extend({
-	initialize: function() {
+    initialize: function() {
         utils.log.info('Controller: Initializing');
         window.App.views.homeView = new HomeView();
     },
@@ -93,8 +105,25 @@ module.exports = Controller = Marionette.Controller.extend({
         // Ensure the URL is correct
         window.App.router.navigate('#/');
     },
-    mapIndex: function() {
+    mapIndex: function(page) {
+    	if (!page) {
+    		page = '1';
+    	}
+        var view = null;
+        window.App.controller.page = page;
 
+        // Get map range
+        var start = (parseInt(page) - 1) * utils.mapIndexLength;
+        var end = start + utils.mapIndexLength;
+        var maps = new Backbone.Collection(window.App.data.maps.slice(start, end));
+
+        if (maps.length  > 0) {
+            view = new MapsView({ collection: maps});
+        } else {
+            view = new NotFoundView();
+        }
+        this.renderView(view);
+        window.App.router.navigate('#/map/' + page);
     },
     mapInteract: function(id) {
 
@@ -109,32 +138,45 @@ module.exports = Controller = Marionette.Controller.extend({
 
     },
     mapAdd: function() {
-
+    	var view = new MapAddView();
+    	this.renderView(view);
+        window.App.router.navigate('#/map/add');
     },
     renderView: function(view) {
         this.destroyCurrentView(view);
         $('#communitymapping-container').html(view.render().el);
     },
     destroyCurrentView: function(view) {
-
+    	if (!_.isUndefined(window.App.views.currentView)) {
+            window.App.views.currentView.close();
+        }
+        window.App.views.currentView = view;
     }
 });
-},{"./utils":5,"./views/home":6}],4:[function(require,module,exports){
+},{"./utils":7,"./views/home":8,"./views/mapadd":9,"./views/maps":10,"./views/notfound":11}],5:[function(require,module,exports){
+var Backbone = require('backbone');
+
+module.exports = MapModel = Backbone.Model.extend({
+    idAttribute: '_id',
+    urlRoot: 'api/map'
+});
+},{}],6:[function(require,module,exports){
 var Marionette = require('backbone.marionette');
 
 module.exports = Router = Marionette.AppRouter.extend({
     appRoutes: {
         ''  : 'home',
-        '/map' : 'mapIndex',
-        '/map/interact/:id' : 'mapInteract',
-        '/map/view/:id' : 'mapView',
-        '/map/timeline/:id' : 'mapTimeline',
-        '/map/edit/:id' : 'mapEdit',
-        '/map/add' : 'mapAdd'
+        'map/interact/:id' : 'mapInteract',
+        'map/view/:id' : 'mapView',
+        'map/timeline/:id' : 'mapTimeline',
+        'map/edit/:id' : 'mapEdit',
+        'map/add' : 'mapAdd',
+        'map' : 'mapIndex',
+        'map/:page' : 'mapIndex'
     }
 });
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 module.exports = {
 	log: {
 		info: function(msg) {
@@ -146,15 +188,99 @@ module.exports = {
 		error: function(msg) {
 			console.log('ERROR ' + msg);
 		}
-	}
+	},
+	mapIndexLength: 1
 };
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var Marionette = require('backbone.marionette');
 
 module.exports = HomeView = Marionette.ItemView.extend({
 	template: require('../../templates/home.hbs')
 });
-},{"../../templates/home.hbs":7}],7:[function(require,module,exports){
+},{"../../templates/home.hbs":12}],9:[function(require,module,exports){
+var Marionette = require('backbone.marionette'),
+    utils = require('../utils');
+
+module.exports = ItemView = Marionette.ItemView.extend({
+    template: require('../../templates/map_add.hbs'),
+    tagName: 'div',
+    className: 'container',
+    // Submit click
+    //events: {
+    //    'click': 'showDetails'
+    //},
+
+    onRender: function(el) {
+        console.log('ehllo');
+    }
+});
+},{"../../templates/map_add.hbs":13,"../utils":7}],10:[function(require,module,exports){
+var Marionette = require('backbone.marionette'),
+    utils = require('../utils');
+
+var itemView = Marionette.ItemView.extend({
+    template: require('../../templates/map_small.hbs'),
+    tagName: 'div',
+    className: 'col-sm-6 col-md-4 map-small-item',
+    initialize: function() {
+        this.listenTo(this.model, 'change', this.render);
+    },
+    //events: {
+    //    'click': 'showDetails'
+    //},
+
+    onRender: function(el) {
+        // Temporarily add the map to the DOM so that it can be sized properly
+        $(el.el).addClass('temp-render');
+        $('body').append($(el.el));
+        
+        var mapOptions = {
+          center: new google.maps.LatLng(el.model.attributes.coordinates.lat, el.model.attributes.coordinates.lng),
+          zoom: 14
+        };
+        var map = new google.maps.Map($(el.el).find(".map-canvas")[0],
+            mapOptions);
+
+        $(el.el).remove();
+        $(el.el).removeClass('temp-render');
+    }
+});
+
+module.exports = CompositeView = Marionette.CompositeView.extend({
+    template: require('../../templates/map_index.hbs'),
+    tagName: 'div',
+    className: 'container',
+    initialize: function() {
+        this.listenTo(this.collection, 'change', this.render);
+    },
+
+    onRender: function(el) {
+        var page = window.App.controller.page;
+        if (page === '1') {
+            $(el.el).find('.pagination-btn-group .prev').addClass('disabled');
+        } else {
+            $(el.el).find('.pagination-btn-group .prev').attr('href', '#/map/' + (parseInt(page, 10) - 1));
+        }
+
+        var remaining = window.App.data.maps.length - (page * utils.mapIndexLength);
+        if (remaining < 1) {
+            $(el.el).find('.pagination-btn-group .next').addClass('disabled');
+        } else {
+            $(el.el).find('.pagination-btn-group .next').attr('href', '#/map/' + (parseInt(page, 10) + 1));
+        }
+    },
+    itemView: itemView,
+    itemViewContainer: '.map-index-item-container'
+});
+},{"../../templates/map_index.hbs":14,"../../templates/map_small.hbs":15,"../utils":7}],11:[function(require,module,exports){
+var Marionette = require('backbone.marionette');
+
+module.exports = NotFoundView = Marionette.ItemView.extend({
+    template: require('../../templates/not_found.hbs'),
+    tagName: 'div',
+    className: 'container'
+});
+},{"../../templates/not_found.hbs":16}],12:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -166,7 +292,80 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   return "<div class=\"admin-container\">\n	<h1 id=\"logo\">Community Mapping</h1>\n	<h2>API</h2>\n		<h3>Map</h3>\n		<dl>\n			<dt><strong>(GET) Index:</strong> Get all maps</dt>\n			<dd class=\"code\">/api/map/index/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(GET) Get by ID:</strong> Get a single map by its ID number</dt>\n			<dd class=\"code\">/api/map/&lt;<em>id</em>&gt;</dd>\n		</dl>\n\n		<h3>Canvas</h3>\n		<dl>\n			<dt><strong>(GET) Index:</strong> Get all canvases</dt>\n			<dd class=\"code\">/api/canvas/index/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(GET) Get by ID:</strong> Get a single canvas by its ID number</dt>\n			<dd class=\"code\">/api/canvas/&lt;<em>id</em>&gt;</dd>\n		</dl>\n\n		<h3>Shape</h3>\n		<dl>\n			<dt><strong>(GET) Index:</strong> Get all shapes</dt>\n			<dd class=\"code\">/api/shape/index/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(GET) Get by ID:</strong> Get a single shape by its ID number</dt>\n			<dd class=\"code\">/api/shape/&lt;<em>id</em>&gt;</dd>\n\n			<dt><strong>(GET) Get by timerange:</strong> Get all shapes created between a given timerange</dt>\n			<dd class=\"code\">/api/shape/timerange/&lt;<em>start</em>&gt;/&lt;<em>end</em>&gt;/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(POST) Add:</strong> Add a shape</dt>\n			<dd class=\"code\">/api/shape</dd>\n		</dl>\n\n		<h3>Story</h3>\n		<dl>\n			<dt><strong>(GET) Index:</strong> Get all stories</dt>\n			<dd class=\"code\">/api/story/index/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(GET) Get by ID:</strong> Get a single story by its ID number</dt>\n			<dd class=\"code\">/api/story/&lt;<em>id</em>&gt;</dd>\n\n			<dt><strong>(GET) Get by spacerange:</strong> Get all stories with coordinates between a given range</dt>\n			<dd class=\"code\">/api/story/spacerange/&lt;<em>lat1</em>&gt;/&lt;<em>lng1</em>&gt;/&lt;<em>lat2</em>&gt;/&lt;<em>lng2</em>&gt;/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(POST) Add:</strong> Add a story</dt>\n			<dd class=\"code\">/api/story</dd>\n		</dl>\n</div>";
   });
 
-},{"hbsfy/runtime":11}],8:[function(require,module,exports){
+},{"hbsfy/runtime":20}],13:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div class=\"row\">\n	<div class=\"col-sm-12\">\n		<h1>Add Map</h1>\n	</div>\n</div>\n\n<div class=\"row\">\n	<div class=\"col-sm-12\">\n		<form role=\"form\">\n			<div class=\"form-group\">\n				<label for=\"inputName\">Map name</label>\n				<input type=\"email\" class=\"form-control\" id=\"inputName\" placeholder=\"Map name\">\n			</div>\n			<button type=\"submit\" class=\"btn btn-default\">Submit</button>\n		</form>\n	</div>\n</div>";
+  });
+
+},{"hbsfy/runtime":20}],14:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div class=\"row\">\n	<div class=\"col-sm-12\">\n		<h1>Maps <a href=\"#/map/add\" class=\"btn btn-default add-map\" role=\"button\">+ Add Map</a></h1>\n	</div>\n</div>\n<div class=\"row map-index-item-container\"></div>\n<div class=\"row\">\n	<div class=\"col-sm-12 pagination-btn-group\">\n		<a href=\"#\" class=\"btn btn-default prev\" role=\"button\">&larr; Prev</a><a href=\"#\" class=\"btn btn-default next\" role=\"button\">Next &rarr;</a>\n	</div>\n</div>";
+  });
+
+},{"hbsfy/runtime":20}],15:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
+
+
+  buffer += "<div class=\"thumbnail\">\n  <div class=\"map-canvas map-item-small-canvas-";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0._id; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" style=\"width:100%;height:200px\"></div>\n  <div class=\"caption\">\n    <h3>";
+  if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0.name; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</h3>\n    <div class=\"btn-group\">\n    	<a href=\"#/map/view/";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0._id; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" class=\"btn btn-primary\" role=\"button\">View</a>\n    	<a href=\"#/map/interact/";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0._id; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" class=\"btn btn-primary\" role=\"button\">Interact</a>\n    	<a href=\"#/map/timeline/";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0._id; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" class=\"btn btn-primary\" role=\"button\">Timeline</a>\n    	<a href=\"#/map/edit/";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0._id; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" class=\"btn btn-default\" role=\"button\">Edit</a>\n    </div>\n  </div>\n</div>";
+  return buffer;
+  });
+
+},{"hbsfy/runtime":20}],16:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<h1>Page not found</h1>";
+  });
+
+},{"hbsfy/runtime":20}],17:[function(require,module,exports){
 /*jshint eqnull: true */
 
 module.exports.create = function() {
@@ -334,7 +533,7 @@ Handlebars.registerHelper('log', function(context, options) {
 return Handlebars;
 };
 
-},{}],9:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 exports.attach = function(Handlebars) {
 
 // BEGIN(BROWSER)
@@ -442,7 +641,7 @@ return Handlebars;
 
 };
 
-},{}],10:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 exports.attach = function(Handlebars) {
 
 var toString = Object.prototype.toString;
@@ -527,7 +726,7 @@ Handlebars.Utils = {
 return Handlebars;
 };
 
-},{}],11:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var hbsBase = require("handlebars/lib/handlebars/base");
 var hbsUtils = require("handlebars/lib/handlebars/utils");
 var hbsRuntime = require("handlebars/lib/handlebars/runtime");
@@ -538,5 +737,5 @@ hbsRuntime.attach(Handlebars);
 
 module.exports = Handlebars;
 
-},{"handlebars/lib/handlebars/base":8,"handlebars/lib/handlebars/runtime":9,"handlebars/lib/handlebars/utils":10}]},{},[1])
+},{"handlebars/lib/handlebars/base":17,"handlebars/lib/handlebars/runtime":18,"handlebars/lib/handlebars/utils":19}]},{},[1])
 ;

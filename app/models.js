@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
 
 var Map = new Schema({
     timestamp: { type: Date, 'default': Date.now },
+    name: String,
     coordinates: {
         lat: String,
         lng: String
@@ -45,7 +46,6 @@ var Story = new Schema({
 });
 
 module.exports = {
-    PAGELENGTH: 10,
     Map: mongoose.model('Map', Map),
     Canvas: mongoose.model('Canvas', Canvas),
     Shape: mongoose.model('Shape', Shape),

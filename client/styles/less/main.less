@@ -1,0 +1,82 @@
+@primary-color: #008CBA;
+@secondary-color: #e7e7e7;
+@alert-color: #f04124;
+@success-color: #43AC6A;
+
+html {
+	font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing:antialiased;
+	color:#2A2A2A;
+}
+
+h3 {
+	margin-top:25px;
+	padding-bottom:5px;
+	border-bottom:1px solid #E2E2E2;
+}
+
+ul {
+	list-style:none;
+}
+
+dt {
+	margin-top:10px;
+}
+
+dd {
+	margin-top:5px;
+}
+
+.code {
+	font-family:Consolas, Courier New, monospace;
+}
+
+.admin-container {
+	max-width:950px;
+	padding:0px 5px;
+	margin:0px auto;
+}
+
+.btn {
+	border-radius:0px;
+	margin-left:0px!important;
+	margin-top:1px!important;
+	margin-right:1px;
+	&:last-of-type {
+		margin-right:0;
+	}
+
+	&.btn-primary {
+		background-color: @success-color;
+		border-color: darken(@success-color, 1%);
+		font-weight:normal;
+
+		&:hover {
+			background-color: darken(@success-color, 3%);
+		}
+	}
+
+	&.btn-default {
+		background-color: @primary-color;
+		border-color: darken(@primary-color, 1%);
+		font-weight:normal;
+		color:#FFFFFF;
+
+		&:hover {
+			background-color: darken(@primary-color, 3%);
+		}
+	}
+
+	&.add-map {
+		float:right;
+	}
+}
+
+.pagination-btn-group {
+	text-align:center;
+}
+
+.temp-render {
+	position:absolute;
+	visibility:hidden;
+}

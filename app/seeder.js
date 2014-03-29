@@ -92,31 +92,62 @@ module.exports = {
                                 var shape2Id = shape._id;
                                 utils.log.info('Successfully inserted shape: ' + shape2Id);
 
-                                // Canvas
-                                var newCanvas = new models.Canvas({
+                                // Canvas1
+                                var canvas1 = new models.Canvas({
                                     shapes: [ shape1Id, shape2Id ],
                                     stories: [ story1Id, story2Id ]
                                 });
 
-                                newCanvas.save(function(err, canvas) {
-                                    canvasId = canvas._id;
-                                    utils.log.info('Successfully inserted canvas: ' + canvasId);
+                                canvas1.save(function(err, canvas) {
+                                    canvas1Id = canvas._id;
+                                    utils.log.info('Successfully inserted canvas: ' + canvas1Id);
 
-                                    // Map
-                                    var newMap = new models.Map({
-                                        coordinates: {
-                                            lat: 92.182,
-                                            lng: -12.834
-                                        },
-                                        canvasId: canvasId,
-                                        style: {
-                                            bgcolor: '#FF0000',
-                                            fgcolor: '#00FF00'
-                                        }
+                                    // Canvas2
+                                    var canvas2 = new models.Canvas({
+                                        shapes: [ shape1Id ],
+                                        stories: [ story2Id ]
                                     });
 
-                                    newMap.save(function(err, map) {
-                                        utils.log.info('Successfully inserted map: ' + map._id);
+                                    canvas2.save(function(err, canvas) {
+                                        canvas2Id = canvas._id;
+                                        utils.log.info('Successfully inserted canvas: ' + canvas2Id);
+
+                                        // Map1
+                                        var map1 = new models.Map({
+                                            name: 'Near Wollongong',
+                                            coordinates: {
+                                                lat: -34.397,
+                                                lng: 150.644
+                                            },
+                                            canvasId: canvas1Id,
+                                            style: {
+                                                bgcolor: '#FF0000',
+                                                fgcolor: '#00FF00'
+                                            }
+                                        });
+
+                                        map1.save(function(err, map) {
+                                            utils.log.info('Successfully inserted map: ' + map1._id);
+
+                                            // Map2
+                                            var map2 = new models.Map({
+                                                name: 'Brighton',
+                                                coordinates: {
+                                                    lat: 50.82253,
+                                                    lng: -0.13716
+                                                },
+                                                canvasId: canvas2Id,
+                                                style: {
+                                                    bgcolor: '#FF0000',
+                                                    fgcolor: '#00FF00'
+                                                }
+                                            });
+
+                                            map2.save(function(err, map) {
+                                                utils.log.info('Successfully inserted map: ' + map2._id);
+                                            });
+                                        });
+
                                     });
 
                                 });

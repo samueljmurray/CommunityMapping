@@ -15,6 +15,11 @@ describe('Models', function() {
             expect(schema._id.instance).to.equal('ObjectID');
         });
 
+        it('should have a name string', function() {
+            expect(schema.name).to.exist;
+            expect(schema.name.instance).to.equal('String');
+        });
+
         it('should have a coordiates object', function() {
             expect(schema['coordinates.lat']).to.exist;
             expect(schema['coordinates.lat'].instance).to.equal('String');
@@ -22,7 +27,7 @@ describe('Models', function() {
             expect(schema['coordinates.lng'].instance).to.equal('String');
         });
 
-        it('should have a canvas Id string', function() {
+        it('should have a canvas Id ObjectId', function() {
             expect(schema.canvasId).to.exist;
             expect(schema.canvasId.instance).to.equal('ObjectID');
         });

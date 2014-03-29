@@ -103,8 +103,17 @@ module.exports = function(grunt) {
                     src: 'build/<%= pkg.name %>.css',
                     dest: 'public/css/<%= pkg.name %>.css'
                 }, {
-                    src: 'client/img/*',
-                    dest: 'public/img/'
+                    expand: true,
+                    flatten: true,
+                    src: ['client/img/**'],
+                    dest: 'public/img/',
+                    filter: 'isFile'
+                }, {
+                    expand: true,
+                    flatten: true,
+                    src: ['client/requires/bootstrap/**'],
+                    dest: 'public/bootstrap/',
+                    filter: 'isFile'
                 }]
             },
             prod: {
@@ -234,7 +243,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('init:dev', ['clean', 'bower', 'browserify:vendor']);
 
-    grunt.registerTask('build:dev', ['clean:dev', 'browserify:app', 'browserify:test', 'jshint:dev', 'less:transpile', 'concat', 'copy:dev']);
+    grunt.registerTask('build:dev', ['clean:dev', 'bower', 'browserify:app', 'browserify:test', 'jshint:dev', 'less:transpile', 'concat', 'copy:dev']);
     grunt.registerTask('build:prod', ['clean:prod', 'browserify:vendor', 'browserify:app', 'jshint:all', 'less:transpile', 'concat', 'cssmin', 'uglify', 'copy:prod']);
 
     grunt.registerTask('heroku', ['init:dev', 'build:dev']);

@@ -2,7 +2,7 @@ var winston = require('winston');
 
 module.exports = {
 	constants: {
-		pagelength: 10
+		pagelength: 12
 	},
 	log: new (winston.Logger)({
 		transports: [

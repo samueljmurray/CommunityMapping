@@ -9,5 +9,6 @@ module.exports = {
 		error: function(msg) {
 			console.log('ERROR ' + msg);
 		}
-	}
+	},
+	mapIndexLength: 1
 };

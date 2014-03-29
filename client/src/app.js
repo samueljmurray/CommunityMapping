@@ -1,9 +1,9 @@
 var Marionette = require('backbone.marionette'),
 	utils = require('./utils'),
     Controller = require('./controller'),
-    Router = require('./router');
-    //MapModel = require('./models/map'),
-    //MapCollection = require('./collections/map');
+    Router = require('./router'),
+    MapModel = require('./models/map'),
+    MapCollection = require('./collections/maps');
 
 // Define and export App
 module.exports = App = function App() {};
@@ -17,16 +17,14 @@ App.prototype.start = function() {
         App.views = {};
         App.data = {};
 
-        // load up some initial data:
-        //var maps = new MapsCollection();
-        //maps.fetch({
-        //    success: function() {
-        //        App.data.maps = maps;
-        //        App.core.vent.trigger('app:start');
-        //    }
-        //});
-
-		App.core.vent.trigger('app:start');
+        // Load maps
+        var maps = new MapsCollection();
+        maps.fetch({
+            success: function() {
+                App.data.maps = maps;
+                App.core.vent.trigger('app:start');
+            }
+        });
 
     });
 

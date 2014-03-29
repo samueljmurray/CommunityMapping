@@ -1,0 +1,63 @@
+html {
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: #2A2A2A;
+}
+h3 {
+  margin-top: 25px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #E2E2E2;
+}
+ul {
+  list-style: none;
+}
+dt {
+  margin-top: 10px;
+}
+dd {
+  margin-top: 5px;
+}
+.code {
+  font-family: Consolas, Courier New, monospace;
+}
+.admin-container {
+  max-width: 950px;
+  padding: 0px 5px;
+  margin: 0px auto;
+}
+.btn {
+  border-radius: 0px;
+  margin-left: 0px!important;
+  margin-top: 1px!important;
+  margin-right: 1px;
+}
+.btn:last-of-type {
+  margin-right: 0;
+}
+.btn.btn-primary {
+  background-color: #43ac6a;
+  border-color: #42a868;
+  font-weight: normal;
+}
+.btn.btn-primary:hover {
+  background-color: #3fa163;
+}
+.btn.btn-default {
+  background-color: #008cba;
+  border-color: #0088b5;
+  font-weight: normal;
+  color: #FFFFFF;
+}
+.btn.btn-default:hover {
+  background-color: #0080ab;
+}
+.btn.add-map {
+  float: right;
+}
+.pagination-btn-group {
+  text-align: center;
+}
+.temp-render {
+  position: absolute;
+  visibility: hidden;
+}
