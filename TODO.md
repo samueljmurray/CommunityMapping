@@ -1,4 +1,5 @@
 # TODO
 
-* Write tests for Backbone/Marionette models
-* Pass Backbone/Marionette models
+* Think about Marionette/Backbone tests
+* Gitignore build dir
+* Remove index endpoints for canvas, shape and story in API
