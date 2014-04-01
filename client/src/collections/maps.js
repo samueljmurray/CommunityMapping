@@ -1,5 +1,5 @@
 var Backbone = require('backbone'),
-    ContactModel = require('../models/map');
+    MapModel = require('../models/map');
 
 module.exports = MapsCollection = Backbone.Collection.extend({
 	initialize: function(page) {

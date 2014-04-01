@@ -10,5 +10,5 @@ module.exports = {
 			console.log('ERROR ' + msg);
 		}
 	},
-	mapIndexLength: 1
+	mapIndexLength: 12
 };

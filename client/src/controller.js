@@ -1,5 +1,5 @@
 var Backbone = require('backbone'),
-	Marionette = require('backbone.marionette'),
+    Marionette = require('backbone.marionette'),
     utils = require('./utils'),
     NotFoundView = require('./views/notfound'),
     HomeView = require('./views/home'),
@@ -18,9 +18,11 @@ module.exports = Controller = Marionette.Controller.extend({
         window.App.router.navigate('#/');
     },
     mapIndex: function(page) {
-    	if (!page) {
-    		page = '1';
-    	}
+        console.log('HELLO');
+        console.log(page);
+        if (!page || page === "") {
+            page = '1';
+        }
         var view = null;
         window.App.controller.page = page;
 
@@ -50,16 +52,21 @@ module.exports = Controller = Marionette.Controller.extend({
 
     },
     mapAdd: function() {
-    	var view = new MapAddView();
-    	this.renderView(view);
+        var view = new MapAddView();
+        this.renderView(view);
         window.App.router.navigate('#/map/add');
+    },
+    notFound: function() {
+        view = new NotFoundView();
+        this.renderView(view);
+        window.App.router.navigate('#/404');
     },
     renderView: function(view) {
         this.destroyCurrentView(view);
         $('#communitymapping-container').html(view.render().el);
     },
     destroyCurrentView: function(view) {
-    	if (!_.isUndefined(window.App.views.currentView)) {
+        if (!_.isUndefined(window.App.views.currentView)) {
             window.App.views.currentView.close();
         }
         window.App.views.currentView = view;

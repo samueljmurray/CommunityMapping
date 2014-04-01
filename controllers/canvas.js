@@ -16,10 +16,17 @@ module.exports = {
                 res.json(canvas);
             }
         });
-    }
-    //add: function(req, res) {
-
-    //},
+    },
+    add: function(req, res) {
+        var newCanvas = new models.Canvas(req.body);
+        newCanvas.save(function(err, canvas) {
+            if (err) {
+                res.json({err: 'Error adding canvas'});
+            } else {
+                res.json(canvas);
+            }
+        });
+    },
     // update: function(req, res) {
 
     // },

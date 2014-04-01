@@ -103,4 +103,45 @@ describe('Map Controller', function() {
 
 	});
 
+	// Add
+	describe('add', function() {
+
+		beforeEach(function() {
+			req.body = {
+				name: 'A title, lorem ipsum...',
+				coordinates: {
+					lat: 86.839,
+					lng: 20.301
+				},
+				style: '{ ... }'
+			};
+		});
+
+		it('should exist', function() {
+			expect(map.add).to.be.a('function');
+		});
+
+		it('should return json on save', function() {
+			modelsStub.Map = sinon.spy(function() {
+				modelsStub.Map.prototype.save = function(callback) {
+					callback(null, req.body);
+					return;
+				}
+			});
+			map.add(req, res);
+			expect(res.json).calledWith(req.body);
+		});
+
+		it('should return json error on error', function() {
+			modelsStub.Map = sinon.spy(function() {
+				modelsStub.Map.prototype.save = function(callback) {
+					callback({}, req.body);
+				}
+			});
+			map.add(req, res);
+			expect(res.json).calledWith({err: 'Error adding map'})
+		});
+
+	});
+
 });

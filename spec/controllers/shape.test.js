@@ -35,29 +35,6 @@ describe('Shape Controller', function() {
 		expect(shape).to.exist;
 	});
 
-	// Index
-	describe('index', function() {
-
-		beforeEach(function() {
-			req = {
-				params: {
-					page: 1,
-					max: undefined
-				}
-			};
-		});
-
-		it('should be defined', function() {
-			expect(shape.index).to.be.a('function');
-		});
-
-		it('should return json', function() {
-			shape.index(req,res);
-			expect(res.json).calledOnce;
-		});
-
-	});
-
 	// Get ID
 	describe('getById', function() {
 

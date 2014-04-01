@@ -33,10 +33,8 @@ describe('Models', function() {
         });
 
         it('should have a style object', function() {
-            expect(schema['style.bgcolor']).to.exist;
-            expect(schema['style.bgcolor'].instance).to.equal('String');
-            expect(schema['style.fgcolor']).to.exist;
-            expect(schema['style.fgcolor'].instance).to.equal('String');
+            expect(schema.style).to.exist;
+            expect(schema.style.instance).to.equal('String');
         });
     });
 

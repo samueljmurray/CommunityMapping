@@ -22,10 +22,17 @@ module.exports = {
                 res.json(map);
             }
         });
-    }
-    //add: function(req, res) {
-
-    //},
+    },
+    add: function(req, res) {
+        var newMap = new models.Map(req.body);
+        newMap.save(function(err, map) {
+            if (err) {
+                res.json({err: 'Error adding map'});
+            } else {
+                res.json(map);
+            }
+        });
+    },
     // update: function(req, res) {
 
     // },

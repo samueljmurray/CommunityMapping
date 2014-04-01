@@ -9,6 +9,7 @@ module.exports = Router = Marionette.AppRouter.extend({
         'map/edit/:id' : 'mapEdit',
         'map/add' : 'mapAdd',
         'map' : 'mapIndex',
-        'map/:page' : 'mapIndex'
+        'map/:page' : 'mapIndex',
+        '*notFound' : 'notFound'
     }
 });

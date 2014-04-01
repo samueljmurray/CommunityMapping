@@ -1,17 +1,32 @@
 <div class="row">
 	<div class="col-sm-12">
-		<h1>Add Map</h1>
+		<h1>
+			Add Map
+			<a class="btn btn-default back-to-maps" role="button">&larr; Back to Maps</a>
+		</h1>
 	</div>
 </div>
 
 <div class="row">
-	<div class="col-sm-12">
+	<div class="col-sm-12 messages"></div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12 form-container">
 		<form role="form">
 			<div class="form-group">
-				<label for="inputName">Map name</label>
-				<input type="email" class="form-control" id="inputName" placeholder="Map name">
+				<label for="inputName" class="control-label">Map name</label>
+				<input type="text" class="form-control" id="inputName" placeholder="Map name">
 			</div>
-			<button type="submit" class="btn btn-default">Submit</button>
+			<div class="form-group">
+				<label for="inputLatitude" class="control-label">Latitude</label>
+				<input type="text" class="form-control" id="inputLatitude" placeholder="Latitude">
+			</div>
+			<div class="form-group">
+				<label for="inputLongitude" class="control-label">Longitude</label>
+				<input type="text" class="form-control" id="inputLongitude" placeholder="Longitude">
+			</div>
+			<button type="submit" class="btn btn-default btn-submit">Submit</button>
 		</form>
 	</div>
 </div>

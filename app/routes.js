@@ -11,13 +11,13 @@ module.exports.initialize = function(app) {
     // Map routes
     app.get('/api/map/index', map.index);
     app.get('/api/map/:id', map.getById);
-    //app.post('/api/maps', maps.add);
-    //app.put('/api/maps', maps.update);
-    //app.delete('/api/maps/:id', maps.delete);
+    app.post('/api/map', map.add);
+    //app.put('/api/map', map.update);
+    //app.delete('/api/map/:id', map.delete);
 
     // Canvas routes
     app.get('/api/canvas/:id', canvas.getById);
-    //app.post('/api/canvas', canvas.add);
+    app.post('/api/canvas', canvas.add);
     //app.put('/api/canvas', canvas.update);
     //app.delete('/api/canvas/:id', canvas.delete);
 

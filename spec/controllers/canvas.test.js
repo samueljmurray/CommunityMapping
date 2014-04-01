@@ -35,29 +35,6 @@ describe('Canvas Controller', function() {
 		expect(canvas).to.exist;
 	});
 
-	// Index
-	describe('index', function() {
-
-		beforeEach(function() {
-			req = {
-				params: {
-					page: 1,
-					max: undefined
-				}
-			};
-		});
-
-		it('should be defined', function() {
-			expect(canvas.index).to.be.a('function');
-		});
-
-		it('should return json', function() {
-			canvas.index(req,res);
-			expect(res.json).calledOnce;
-		});
-
-	});
-
 	// Get ID
 	describe('getById', function() {
 
@@ -99,6 +76,43 @@ describe('Canvas Controller', function() {
 			};
 			canvas.getById(req, res);
 			expect(res.send).calledWith(500);
+		});
+
+	});
+
+	// Add
+	describe('add', function() {
+
+		beforeEach(function() {
+			req.body = {
+				shapes: [12345, 67890],
+				stories: [12345, 67890]
+			};
+		});
+
+		it('should exist', function() {
+			expect(canvas.add).to.be.a('function');
+		});
+
+		it('should return json on save', function() {
+			modelsStub.Canvas = sinon.spy(function() {
+				modelsStub.Canvas.prototype.save = function(callback) {
+					callback(null, req.body);
+					return;
+				}
+			});
+			canvas.add(req, res);
+			expect(res.json).calledWith(req.body);
+		});
+
+		it('should return json error on error', function() {
+			modelsStub.Canvas = sinon.spy(function() {
+				modelsStub.Canvas.prototype.save = function(callback) {
+					callback({}, req.body);
+				}
+			});
+			canvas.add(req, res);
+			expect(res.json).calledWith({err: 'Error adding canvas'})
 		});
 
 	});

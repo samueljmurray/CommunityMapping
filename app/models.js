@@ -10,10 +10,7 @@ var Map = new Schema({
         lng: String
     },
     canvasId: Schema.ObjectId,
-    style: {
-        bgcolor: String,
-        fgcolor: String
-    }
+    style: String
 });
 
 var Canvas = new Schema({

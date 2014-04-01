@@ -35,29 +35,6 @@ describe('Story Controller', function() {
 		expect(story).to.exist;
 	});
 
-	// Index
-	describe('index', function() {
-
-		beforeEach(function() {
-			req = {
-				params: {
-					page: 1,
-					max: undefined
-				}
-			};
-		});
-
-		it('should exist', function() {
-			expect(story.index).to.be.a('function');
-		});
-
-		it('should return json', function() {
-			story.index(req, res);
-			expect(res.json).calledOnce;
-		});
-
-	});
-
 	// GetById
 	describe('getById', function() {
 
