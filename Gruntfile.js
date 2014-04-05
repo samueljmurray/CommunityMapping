@@ -251,7 +251,7 @@ module.exports = function(grunt) {
     grunt.registerTask('server', ['build:dev', 'concurrent:dev']);
     grunt.registerTask('test:server', ['simplemocha:server']);
 
-    grunt.registerTask('test:client', ['karma:test']);
+    grunt.registerTask('test:client', ['browserify:test', 'karma:test']);
     grunt.registerTask('tdd', ['karma:watcher:start', 'concurrent:test']);
 
     grunt.registerTask('test', ['test:server', 'test:client']);

@@ -18,7 +18,7 @@ App.prototype.start = function() {
         App.data = {};
 
         // Load maps
-        var maps = new MapsCollection();
+        var maps = new MapCollection();
         maps.fetch({
             success: function() {
                 App.data.maps = maps;
