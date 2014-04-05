@@ -1,3 +1,3 @@
 # TODO
 
-* Think about Marionette/Backbone tests
+* Implement MapView view
