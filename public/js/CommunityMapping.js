@@ -17209,8 +17209,6 @@ module.exports = Controller = Marionette.Controller.extend({
     home: function() {
         var view = window.App.views.homeView;
         this.renderView(view);
-        // Ensure the URL is correct
-        window.App.router.navigate('#/');
     },
     mapIndex: function(page) {
         console.log('HELLO');
@@ -17232,7 +17230,6 @@ module.exports = Controller = Marionette.Controller.extend({
             view = new NotFoundView();
         }
         this.renderView(view);
-        window.App.router.navigate('#/map/' + page);
     },
     mapInteract: function(id) {
 
@@ -17254,7 +17251,6 @@ module.exports = Controller = Marionette.Controller.extend({
     notFound: function() {
         view = new NotFoundView();
         this.renderView(view);
-        window.App.router.navigate('#/404');
     },
     renderView: function(view) {
         this.destroyCurrentView(view);
@@ -17334,7 +17330,8 @@ module.exports = ItemView = Marionette.ItemView.extend({
     className: 'container',
     events: {
         'click .btn-submit': 'validateField',
-        'click .back-to-maps': 'backToMaps'
+        'click .to-maps': 'toMaps',
+        'click .back': 'back'
     },
 
     validateField: function(e) {
@@ -17391,7 +17388,10 @@ module.exports = ItemView = Marionette.ItemView.extend({
             $('.messages').append('<div class="alert alert-success">Map <strong>' + map.attributes.name + '</strong> added successfully.</div>');
         }});
     },
-    backToMaps: function() {
+    toMaps: function() {
+        window.App.router.navigate('#/map');
+    },
+    back: function() {
         window.history.back();
     }
 });
@@ -17470,7 +17470,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"admin-container\">\n	<h1 id=\"logo\">Community Mapping</h1>\n	<h2>API</h2>\n		<h3>Map</h3>\n		<dl>\n			<dt><strong>(GET) Index:</strong> Get all maps</dt>\n			<dd class=\"code\">/api/map/index</dd>\n\n			<dt><strong>(GET) Get by ID:</strong> Get a single map by its ID number</dt>\n			<dd class=\"code\">/api/map/&lt;<em>id</em>&gt;</dd>\n		</dl>\n\n		<h3>Canvas</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single canvas by its ID number</dt>\n			<dd class=\"code\">/api/canvas/&lt;<em>id</em>&gt;</dd>\n		</dl>\n\n		<h3>Shape</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single shape by its ID number</dt>\n			<dd class=\"code\">/api/shape/&lt;<em>id</em>&gt;</dd>\n\n			<dt><strong>(GET) Get by timerange:</strong> Get all shapes created between a given timerange</dt>\n			<dd class=\"code\">/api/shape/timerange/&lt;<em>start</em>&gt;/&lt;<em>end</em>&gt;/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(POST) Add:</strong> Add a shape</dt>\n			<dd class=\"code\">/api/shape</dd>\n		</dl>\n\n		<h3>Story</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single story by its ID number</dt>\n			<dd class=\"code\">/api/story/&lt;<em>id</em>&gt;</dd>\n\n			<dt><strong>(GET) Get by spacerange:</strong> Get all stories with coordinates between a given range</dt>\n			<dd class=\"code\">/api/story/spacerange/&lt;<em>lat1</em>&gt;/&lt;<em>lng1</em>&gt;/&lt;<em>lat2</em>&gt;/&lt;<em>lng2</em>&gt;/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(POST) Add:</strong> Add a story</dt>\n			<dd class=\"code\">/api/story</dd>\n		</dl>\n		<div class=\"bs-callout bs-callout-danger\">Hello</div>\n</div>";
+  return "<div class=\"admin-container\">\n	<h1 id=\"logo\">Community Mapping</h1>\n	<div class=\"btn-group\">\n    	<a href=\"#/map\" class=\"btn btn-default\" role=\"button\">Maps</a>\n    </div>\n	<h2>API</h2>\n		<h3>Map</h3>\n		<dl>\n			<dt><strong>(GET) Index:</strong> Get all maps</dt>\n			<dd class=\"code\">/api/map/index</dd>\n\n			<dt><strong>(GET) Get by ID:</strong> Get a single map by its ID number</dt>\n			<dd class=\"code\">/api/map/&lt;<em>id</em>&gt;</dd>\n		</dl>\n\n		<h3>Canvas</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single canvas by its ID number</dt>\n			<dd class=\"code\">/api/canvas/&lt;<em>id</em>&gt;</dd>\n		</dl>\n\n		<h3>Shape</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single shape by its ID number</dt>\n			<dd class=\"code\">/api/shape/&lt;<em>id</em>&gt;</dd>\n\n			<dt><strong>(GET) Get by timerange:</strong> Get all shapes created between a given timerange</dt>\n			<dd class=\"code\">/api/shape/timerange/&lt;<em>start</em>&gt;/&lt;<em>end</em>&gt;/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(POST) Add:</strong> Add a shape</dt>\n			<dd class=\"code\">/api/shape</dd>\n		</dl>\n\n		<h3>Story</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single story by its ID number</dt>\n			<dd class=\"code\">/api/story/&lt;<em>id</em>&gt;</dd>\n\n			<dt><strong>(GET) Get by spacerange:</strong> Get all stories with coordinates between a given range</dt>\n			<dd class=\"code\">/api/story/spacerange/&lt;<em>lat1</em>&gt;/&lt;<em>lng1</em>&gt;/&lt;<em>lat2</em>&gt;/&lt;<em>lng2</em>&gt;/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(POST) Add:</strong> Add a story</dt>\n			<dd class=\"code\">/api/story</dd>\n		</dl>\n		<div class=\"bs-callout bs-callout-danger\">Hello</div>\n</div>";
   });
 
 },{"hbsfy/runtime":21}],14:[function(require,module,exports){
@@ -17482,7 +17482,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"row\">\n	<div class=\"col-sm-12\">\n		<h1>\n			Add Map\n			<a class=\"btn btn-default back-to-maps\" role=\"button\">&larr; Back to Maps</a>\n		</h1>\n	</div>\n</div>\n\n<div class=\"row\">\n	<div class=\"col-sm-12 messages\"></div>\n</div>\n\n<div class=\"row\">\n	<div class=\"col-sm-12 form-container\">\n		<form role=\"form\">\n			<div class=\"form-group\">\n				<label for=\"inputName\" class=\"control-label\">Map name</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputName\" placeholder=\"Map name\">\n			</div>\n			<div class=\"form-group\">\n				<label for=\"inputLatitude\" class=\"control-label\">Latitude</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputLatitude\" placeholder=\"Latitude\">\n			</div>\n			<div class=\"form-group\">\n				<label for=\"inputLongitude\" class=\"control-label\">Longitude</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputLongitude\" placeholder=\"Longitude\">\n			</div>\n			<button type=\"submit\" class=\"btn btn-default btn-submit\">Submit</button>\n		</form>\n	</div>\n</div>";
+  return "<div class=\"row\">\n	<div class=\"col-sm-12\">\n		<h1>\n			Add Map\n			<div class=\"btn-group float-right\">\n				<a class=\"btn btn-default back\" role=\"button\">&larr; Back</a>\n				<a class=\"btn btn-default to-maps\" role=\"button\">Maps</a>\n			</div>\n		</h1>\n	</div>\n</div>\n\n<div class=\"row\">\n	<div class=\"col-sm-12 messages\"></div>\n</div>\n\n<div class=\"row\">\n	<div class=\"col-sm-12 form-container\">\n		<form role=\"form\">\n			<div class=\"form-group\">\n				<label for=\"inputName\" class=\"control-label\">Map name</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputName\" placeholder=\"Map name\">\n			</div>\n			<div class=\"form-group\">\n				<label for=\"inputLatitude\" class=\"control-label\">Latitude</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputLatitude\" placeholder=\"Latitude\">\n			</div>\n			<div class=\"form-group\">\n				<label for=\"inputLongitude\" class=\"control-label\">Longitude</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputLongitude\" placeholder=\"Longitude\">\n			</div>\n			<button type=\"submit\" class=\"btn btn-default btn-submit\">Submit</button>\n		</form>\n	</div>\n</div>";
   });
 
 },{"hbsfy/runtime":21}],15:[function(require,module,exports){
@@ -17494,7 +17494,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"row\">\n	<div class=\"col-sm-12\">\n		<h1>Maps <a href=\"#/map/add\" class=\"btn btn-default add-map\" role=\"button\">+ Add Map</a></h1>\n	</div>\n</div>\n<div class=\"row map-index-item-container\"></div>\n<div class=\"row\">\n	<div class=\"col-sm-12 pagination-btn-group\">\n		<hr/>\n		<a href=\"#\" class=\"btn btn-default prev\" role=\"button\">&larr; Prev</a><a href=\"#\" class=\"btn btn-default next\" role=\"button\">Next &rarr;</a>\n	</div>\n</div>";
+  return "<div class=\"row\">\n	<div class=\"col-sm-12\">\n		<h1>Maps <a href=\"#/map/add\" class=\"btn btn-default add-map float-right\" role=\"button\">+ Add Map</a></h1>\n	</div>\n</div>\n<div class=\"row map-index-item-container\"></div>\n<div class=\"row\">\n	<div class=\"col-sm-12 pagination-btn-group\">\n		<hr/>\n		<a href=\"#\" class=\"btn btn-default prev\" role=\"button\">&larr; Prev</a><a href=\"#\" class=\"btn btn-default next\" role=\"button\">Next &rarr;</a>\n	</div>\n</div>";
   });
 
 },{"hbsfy/runtime":21}],16:[function(require,module,exports){

@@ -20,6 +20,9 @@ dt {
 dd {
   margin-top: 5px;
 }
+.float-right {
+  float: right;
+}
 .code {
   font-family: Consolas, Courier New, monospace;
 }
@@ -53,10 +56,6 @@ dd {
 }
 .btn.btn-default:hover {
   background-color: #0080ab;
-}
-.btn.add-map,
-.btn.back-to-maps {
-  float: right;
 }
 .pagination-btn-group {
   text-align: center;

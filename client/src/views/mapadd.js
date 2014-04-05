@@ -8,7 +8,8 @@ module.exports = ItemView = Marionette.ItemView.extend({
     className: 'container',
     events: {
         'click .btn-submit': 'validateField',
-        'click .back-to-maps': 'backToMaps'
+        'click .to-maps': 'toMaps',
+        'click .back': 'back'
     },
 
     validateField: function(e) {
@@ -65,7 +66,10 @@ module.exports = ItemView = Marionette.ItemView.extend({
             $('.messages').append('<div class="alert alert-success">Map <strong>' + map.attributes.name + '</strong> added successfully.</div>');
         }});
     },
-    backToMaps: function() {
+    toMaps: function() {
+        window.App.router.navigate('#/map');
+    },
+    back: function() {
         window.history.back();
     }
 });

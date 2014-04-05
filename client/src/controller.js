@@ -14,8 +14,6 @@ module.exports = Controller = Marionette.Controller.extend({
     home: function() {
         var view = window.App.views.homeView;
         this.renderView(view);
-        // Ensure the URL is correct
-        window.App.router.navigate('#/');
     },
     mapIndex: function(page) {
         console.log('HELLO');
@@ -37,7 +35,6 @@ module.exports = Controller = Marionette.Controller.extend({
             view = new NotFoundView();
         }
         this.renderView(view);
-        window.App.router.navigate('#/map/' + page);
     },
     mapInteract: function(id) {
 
@@ -59,7 +56,6 @@ module.exports = Controller = Marionette.Controller.extend({
     notFound: function() {
         view = new NotFoundView();
         this.renderView(view);
-        window.App.router.navigate('#/404');
     },
     renderView: function(view) {
         this.destroyCurrentView(view);
