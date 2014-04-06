@@ -21,10 +21,14 @@ describe('Models', function() {
         });
 
         it('should have a coordiates object', function() {
-            expect(schema['coordinates.lat']).to.exist;
-            expect(schema['coordinates.lat'].instance).to.equal('String');
-            expect(schema['coordinates.lng']).to.exist;
-            expect(schema['coordinates.lng'].instance).to.equal('String');
+            expect(schema['coordinates.sw.lat']).to.exist;
+            expect(schema['coordinates.sw.lat'].instance).to.equal('String');
+            expect(schema['coordinates.sw.lng']).to.exist;
+            expect(schema['coordinates.sw.lng'].instance).to.equal('String');
+            expect(schema['coordinates.ne.lat']).to.exist;
+            expect(schema['coordinates.ne.lat'].instance).to.equal('String');
+            expect(schema['coordinates.ne.lng']).to.exist;
+            expect(schema['coordinates.ne.lng'].instance).to.equal('String');
         });
 
         it('should have a canvas Id ObjectId', function() {

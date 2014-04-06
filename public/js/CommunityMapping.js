@@ -17199,6 +17199,7 @@ var Backbone = require('backbone'),
     NotFoundView = require('./views/notfound'),
     HomeView = require('./views/home'),
     MapsView = require('./views/maps'),
+    MapViewView = require('./views/mapview'),
     MapAddView = require('./views/mapadd');
 
 module.exports = Controller = Marionette.Controller.extend({
@@ -17211,8 +17212,6 @@ module.exports = Controller = Marionette.Controller.extend({
         this.renderView(view);
     },
     mapIndex: function(page) {
-        console.log('HELLO');
-        console.log(page);
         if (!page || page === "") {
             page = '1';
         }
@@ -17224,17 +17223,25 @@ module.exports = Controller = Marionette.Controller.extend({
         var end = start + utils.mapIndexLength;
         var maps = new Backbone.Collection(window.App.data.maps.slice(start, end));
 
-        if (maps.length  > 0) {
+        if (maps.length === 0 && page === '1') {
+            view = new MapsView();
+        } else if (maps.length  > 0) {
             view = new MapsView({ collection: maps});
         } else {
             view = new NotFoundView();
         }
         this.renderView(view);
     },
-    mapInteract: function(id) {
-
-    },
     mapView: function(id) {
+        var map = new Backbone.Model(window.App.data.maps.get(id));
+        if (map.id == id) {
+            view = new MapViewView({model: map});
+        } else {
+            view = new NotFoundView();
+        }
+        this.renderView(view);
+    },
+    mapInteract: function(id) {
 
     },
     mapTimeline: function(id) {
@@ -17263,7 +17270,7 @@ module.exports = Controller = Marionette.Controller.extend({
         window.App.views.currentView = view;
     }
 });
-},{"./utils":8,"./views/home":9,"./views/mapadd":10,"./views/maps":11,"./views/notfound":12}],4:[function(require,module,exports){
+},{"./utils":8,"./views/home":9,"./views/mapadd":10,"./views/maps":11,"./views/mapview":12,"./views/notfound":13}],4:[function(require,module,exports){
 var App = require('./app');
 var communitymapping = new App();
 communitymapping.start();
@@ -17319,7 +17326,7 @@ var Marionette = require('backbone.marionette');
 module.exports = HomeView = Marionette.ItemView.extend({
 	template: require('../../templates/home.hbs')
 });
-},{"../../templates/home.hbs":13}],10:[function(require,module,exports){
+},{"../../templates/home.hbs":14}],10:[function(require,module,exports){
 var Marionette = require('backbone.marionette'),
     utils = require('../utils'),
     canvasModel = require('../models/canvas');
@@ -17338,39 +17345,46 @@ module.exports = ItemView = Marionette.ItemView.extend({
         // Suppress normal form submission behaviour
         e.preventDefault();
 
-        var map = {};
-        map.coordinates = {};
+        var map = {
+            coordinates: {
+                sw: {},
+                ne: {}
+            }
+        };
 
         var errors = [];
 
         // Validate name
         if (this.$el.find('form #inputName').val() === "") {
             this.$el.find('form #inputName').parent('.form-group').addClass('has-error');
-            errors.push('Invalid map name.');
+            errors.push('Invalid map name');
         } else {
             this.$el.find('form #inputName').parent('.form-group').removeClass('has-error');
-            map.name = this.$el.find('form #inputName').val();
         }
 
-        // Validate latitude
-        if (isNaN(parseFloat(this.$el.find('form #inputLatitude').val()).toFixed(3))) {
-            this.$el.find('form #inputLatitude').parent('.form-group').addClass('has-error');
-            errors.push('Invalid latitude.');
-        } else {
-            this.$el.find('form #inputLatitude').parent('.form-group').removeClass('has-error');
-            map.coordinates.lat = parseFloat(parseFloat(this.$el.find('form #inputLatitude').val()).toFixed(3));
-        }
-
-        // Validate longitude
-        if (isNaN(parseFloat(this.$el.find('form #inputLongitude').val()).toFixed(3))) {
-            this.$el.find('form #inputLongitude').parent('.form-group').addClass('has-error');
-            errors.push('Invalid longitude.');
-        } else {
-            this.$el.find('form #inputLongitude').parent('.form-group').removeClass('has-error');
-            map.coordinates.lng = parseFloat(parseFloat(this.$el.find('form #inputLongitude').val()).toFixed(3));
-        }
+        // Validate coordinate fields
+        var coordFields = {
+            'inputSWLatitude': 'SW Latitude',
+            'inputSWLongitude': 'SW Longitude',
+            'inputNELatitude': 'NE Latitude',
+            'inputNELongitude': 'NE Longitude'
+        };
+        var that = this;
+        $.each(coordFields, function(fieldName, fieldLabel) {
+            if (isNaN(parseFloat(that.$el.find('form #' + fieldName).val()).toFixed(3))) {
+                that.$el.find('form #' + fieldName).parent('.form-group').addClass('has-error');
+                errors.push('Invalid: ' + fieldLabel);
+            } else {
+                that.$el.find('form #' + fieldName).parent('.form-group').removeClass('has-error');
+            }
+        });
 
         if (errors.length === 0) {
+            map.name = this.$el.find('form #inputName').val();
+            map.coordinates.sw.lat = parseFloat(this.$el.find('form #inputSWLatitude').val());
+            map.coordinates.sw.lng = parseFloat(this.$el.find('form #inputSWLongitude').val());
+            map.coordinates.ne.lat = parseFloat(this.$el.find('form #inputNELatitude').val());
+            map.coordinates.ne.lng = parseFloat(this.$el.find('form #inputNELongitude').val());
             this.addMap(map);
         } else {
             $('.messages').empty();
@@ -17395,7 +17409,7 @@ module.exports = ItemView = Marionette.ItemView.extend({
         window.history.back();
     }
 });
-},{"../../templates/map_add.hbs":14,"../models/canvas":5,"../utils":8}],11:[function(require,module,exports){
+},{"../../templates/map_add.hbs":15,"../models/canvas":5,"../utils":8}],11:[function(require,module,exports){
 var Marionette = require('backbone.marionette'),
     utils = require('../utils');
 
@@ -17406,21 +17420,56 @@ var itemView = Marionette.ItemView.extend({
     initialize: function() {
         this.listenTo(this.model, 'change', this.render);
     },
-    //events: {
-    //    'click': 'showDetails'
-    //},
 
     onRender: function(el) {
         // Temporarily add the map to the DOM so that it can be sized properly
         this.$el.addClass('temp-render');
         $('body').append(this.$el);
+
+        console.log('Map Index appended');
+
+        var swLat = parseFloat(this.model.attributes.coordinates.sw.lat);
+        var swLng = parseFloat(this.model.attributes.coordinates.sw.lng);
+        var neLat = parseFloat(this.model.attributes.coordinates.ne.lat);
+        var neLng = parseFloat(this.model.attributes.coordinates.ne.lng);
+
+        var swCoords = new google.maps.LatLng(swLat, swLng);
+        var neCoords = new google.maps.LatLng(neLat, neLng);
+
+        var mapBounds = new google.maps.LatLngBounds(swCoords, neCoords);
+
+        var mapCenter = new google.maps.LatLng(
+            swLat + ((neLat - swLat) / 2),
+            swLng + ((neLng - swLng) / 2)
+        );
         
         var mapOptions = {
-          center: new google.maps.LatLng(el.model.attributes.coordinates.lat, el.model.attributes.coordinates.lng),
-          zoom: 14
+          center: mapCenter,
+          zoom: 1
         };
         var map = new google.maps.Map(this.$el.find(".map-canvas")[0],
             mapOptions);
+
+        map.fitBounds(mapBounds);
+
+        var rectangle = new google.maps.Rectangle();
+
+        var rectOptions = {
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 1,
+          fillColor: '#FFFFFF',
+          fillOpacity: 0,
+          map: map,
+          bounds: mapBounds
+        };
+        rectangle.setOptions(rectOptions);
+
+        google.maps.event.addDomListener(window, 'resize', function() {
+            var center = map.getCenter();
+            google.maps.event.trigger(map, "resize");
+            map.setCenter(center);
+        });
 
         this.$el.remove();
         this.$el.removeClass('temp-render');
@@ -17431,11 +17480,19 @@ module.exports = CompositeView = Marionette.CompositeView.extend({
     template: require('../../templates/map_index.hbs'),
     tagName: 'div',
     className: 'container',
+    itemView: itemView,
+    itemViewContainer: '.map-index-item-container',
     initialize: function() {
-        this.listenTo(this.collection, 'change', this.render);
+        if (this.collection) {
+            this.listenTo(this.collection, 'change', this.render);
+        }
     },
 
     onRender: function() {
+        if (!this.collection) {
+            console.log('No collection');
+            this.$el.find('.map-index-item-container').append('<div class="col-sm-12"><p>No maps found. <a href="#/map/add">Click here to add one</a></p></div>');
+        }
         var page = window.App.controller.page;
         if (page === '1') {
             this.$el.find('.pagination-btn-group .prev').addClass('disabled');
@@ -17449,11 +17506,81 @@ module.exports = CompositeView = Marionette.CompositeView.extend({
         } else {
             this.$el.find('.pagination-btn-group .next').attr('href', '#/map/' + (parseInt(page, 10) + 1));
         }
-    },
-    itemView: itemView,
-    itemViewContainer: '.map-index-item-container'
+    }
 });
-},{"../../templates/map_index.hbs":15,"../../templates/map_small.hbs":16,"../utils":8}],12:[function(require,module,exports){
+},{"../../templates/map_index.hbs":16,"../../templates/map_small.hbs":17,"../utils":8}],12:[function(require,module,exports){
+var Marionette = require('backbone.marionette'),
+    utils = require('../utils');
+
+module.exports = itemView = Marionette.ItemView.extend({
+	template: require('../../templates/map_view.hbs'),
+    tagName: 'div',
+    className: 'fullscreen-container',
+    initialize: function() {
+		// Listening to map model rather than canvas model
+		// Should it re-render the whole view?
+		// Should it even be listening?
+		// What causes the model to change?
+		this.listenTo(this.model, 'change', this.render);
+	},
+
+	onRender: function() {
+		// Temporarily add the map to the DOM so that it can be sized properly
+        this.$el.addClass('temp-render');
+        this.$el.css('width','inherit');
+        console.log($('body'));
+        $('body').append(this.$el);
+
+        console.log('Map View appended');
+
+        var swLat = parseFloat(this.model.attributes.attributes.coordinates.sw.lat);
+        var swLng = parseFloat(this.model.attributes.attributes.coordinates.sw.lng);
+        var neLat = parseFloat(this.model.attributes.attributes.coordinates.ne.lat);
+        var neLng = parseFloat(this.model.attributes.attributes.coordinates.ne.lng);
+
+        var swCoords = new google.maps.LatLng(swLat, swLng);
+        var neCoords = new google.maps.LatLng(neLat, neLng);
+
+        var mapBounds = new google.maps.LatLngBounds(swCoords, neCoords);
+
+        var mapCenter = new google.maps.LatLng(
+            swLat + ((neLat - swLat) / 2),
+            swLng + ((neLng - swLng) / 2)
+        );
+        
+        var mapOptions = {
+          center: mapCenter,
+          zoom: 1
+        };
+        var map = new google.maps.Map(this.$el.find(".map-canvas")[0],
+            mapOptions);
+
+        map.fitBounds(mapBounds);
+
+        var rectangle = new google.maps.Rectangle();
+
+        var rectOptions = {
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 1,
+          fillColor: '#FFFFFF',
+          fillOpacity: 0,
+          map: map,
+          bounds: mapBounds
+        };
+        rectangle.setOptions(rectOptions);
+
+		google.maps.event.addDomListener(window, 'resize', function() {
+			var center = map.getCenter();
+			google.maps.event.trigger(map, 'resize');
+			map.setCenter(center);
+		});
+
+        this.$el.remove();
+        this.$el.removeClass('temp-render');
+	}
+});
+},{"../../templates/map_view.hbs":18,"../utils":8}],13:[function(require,module,exports){
 var Marionette = require('backbone.marionette');
 
 module.exports = NotFoundView = Marionette.ItemView.extend({
@@ -17461,7 +17588,7 @@ module.exports = NotFoundView = Marionette.ItemView.extend({
     tagName: 'div',
     className: 'container'
 });
-},{"../../templates/not_found.hbs":17}],13:[function(require,module,exports){
+},{"../../templates/not_found.hbs":19}],14:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -17473,7 +17600,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   return "<div class=\"admin-container\">\n	<h1 id=\"logo\">Community Mapping</h1>\n	<div class=\"btn-group\">\n    	<a href=\"#/map\" class=\"btn btn-default\" role=\"button\">Maps</a>\n    </div>\n	<h2>API</h2>\n		<h3>Map</h3>\n		<dl>\n			<dt><strong>(GET) Index:</strong> Get all maps</dt>\n			<dd class=\"code\">/api/map/index</dd>\n\n			<dt><strong>(GET) Get by ID:</strong> Get a single map by its ID number</dt>\n			<dd class=\"code\">/api/map/&lt;<em>id</em>&gt;</dd>\n		</dl>\n\n		<h3>Canvas</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single canvas by its ID number</dt>\n			<dd class=\"code\">/api/canvas/&lt;<em>id</em>&gt;</dd>\n		</dl>\n\n		<h3>Shape</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single shape by its ID number</dt>\n			<dd class=\"code\">/api/shape/&lt;<em>id</em>&gt;</dd>\n\n			<dt><strong>(GET) Get by timerange:</strong> Get all shapes created between a given timerange</dt>\n			<dd class=\"code\">/api/shape/timerange/&lt;<em>start</em>&gt;/&lt;<em>end</em>&gt;/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(POST) Add:</strong> Add a shape</dt>\n			<dd class=\"code\">/api/shape</dd>\n		</dl>\n\n		<h3>Story</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single story by its ID number</dt>\n			<dd class=\"code\">/api/story/&lt;<em>id</em>&gt;</dd>\n\n			<dt><strong>(GET) Get by spacerange:</strong> Get all stories with coordinates between a given range</dt>\n			<dd class=\"code\">/api/story/spacerange/&lt;<em>lat1</em>&gt;/&lt;<em>lng1</em>&gt;/&lt;<em>lat2</em>&gt;/&lt;<em>lng2</em>&gt;/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(POST) Add:</strong> Add a story</dt>\n			<dd class=\"code\">/api/story</dd>\n		</dl>\n		<div class=\"bs-callout bs-callout-danger\">Hello</div>\n</div>";
   });
 
-},{"hbsfy/runtime":21}],14:[function(require,module,exports){
+},{"hbsfy/runtime":23}],15:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -17482,10 +17609,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"row\">\n	<div class=\"col-sm-12\">\n		<h1>\n			Add Map\n			<div class=\"btn-group float-right\">\n				<a class=\"btn btn-default back\" role=\"button\">&larr; Back</a>\n				<a class=\"btn btn-default to-maps\" role=\"button\">Maps</a>\n			</div>\n		</h1>\n	</div>\n</div>\n\n<div class=\"row\">\n	<div class=\"col-sm-12 messages\"></div>\n</div>\n\n<div class=\"row\">\n	<div class=\"col-sm-12 form-container\">\n		<form role=\"form\">\n			<div class=\"form-group\">\n				<label for=\"inputName\" class=\"control-label\">Map name</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputName\" placeholder=\"Map name\">\n			</div>\n			<div class=\"form-group\">\n				<label for=\"inputLatitude\" class=\"control-label\">Latitude</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputLatitude\" placeholder=\"Latitude\">\n			</div>\n			<div class=\"form-group\">\n				<label for=\"inputLongitude\" class=\"control-label\">Longitude</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputLongitude\" placeholder=\"Longitude\">\n			</div>\n			<button type=\"submit\" class=\"btn btn-default btn-submit\">Submit</button>\n		</form>\n	</div>\n</div>";
+  return "<div class=\"row\">\n	<div class=\"col-sm-12\">\n		<h1>\n			Add Map\n			<div class=\"btn-group float-right\">\n				<a class=\"btn btn-default back\" role=\"button\">&larr; Back</a>\n				<a class=\"btn btn-default to-maps\" role=\"button\">Maps</a>\n			</div>\n		</h1>\n	</div>\n</div>\n\n<div class=\"row\">\n	<div class=\"col-sm-12 messages\"></div>\n</div>\n\n<div class=\"row\">\n	<div class=\"col-sm-12 form-container\">\n		<form role=\"form\">\n			<div class=\"form-group\">\n				<label for=\"inputName\" class=\"control-label\">Map name</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputName\" placeholder=\"Map name\">\n			</div>\n			<div class=\"form-group\">\n				<label for=\"inputSWLatitude\" class=\"control-label\">SW Latitude</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputSWLatitude\" placeholder=\"SW Latitude\">\n			</div>\n			<div class=\"form-group\">\n				<label for=\"inputSWLongitude\" class=\"control-label\">SW Longitude</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputSWLongitude\" placeholder=\"SW Longitude\">\n			</div>\n			<div class=\"form-group\">\n				<label for=\"inputNELatitude\" class=\"control-label\">NE Latitude</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputNELatitude\" placeholder=\"NE Latitude\">\n			</div>\n			<div class=\"form-group\">\n				<label for=\"inputNELongitude\" class=\"control-label\">NE Longitude</label>\n				<input type=\"text\" class=\"form-control\" id=\"inputNELongitude\" placeholder=\"NE Longitude\">\n			</div>\n			<button type=\"submit\" class=\"btn btn-default btn-submit\">Submit</button>\n		</form>\n	</div>\n</div>";
   });
 
-},{"hbsfy/runtime":21}],15:[function(require,module,exports){
+},{"hbsfy/runtime":23}],16:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -17497,7 +17624,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   return "<div class=\"row\">\n	<div class=\"col-sm-12\">\n		<h1>Maps <a href=\"#/map/add\" class=\"btn btn-default add-map float-right\" role=\"button\">+ Add Map</a></h1>\n	</div>\n</div>\n<div class=\"row map-index-item-container\"></div>\n<div class=\"row\">\n	<div class=\"col-sm-12 pagination-btn-group\">\n		<hr/>\n		<a href=\"#\" class=\"btn btn-default prev\" role=\"button\">&larr; Prev</a><a href=\"#\" class=\"btn btn-default next\" role=\"button\">Next &rarr;</a>\n	</div>\n</div>";
   });
 
-},{"hbsfy/runtime":21}],16:[function(require,module,exports){
+},{"hbsfy/runtime":23}],17:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -17534,7 +17661,24 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   return buffer;
   });
 
-},{"hbsfy/runtime":21}],17:[function(require,module,exports){
+},{"hbsfy/runtime":23}],18:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
+
+
+  buffer += "<div class=\"map-canvas map-view-canvas-";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0._id; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" style=\"width:100%;height:100%\"></div>";
+  return buffer;
+  });
+
+},{"hbsfy/runtime":23}],19:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -17546,7 +17690,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   return "<h1>Page not found</h1>";
   });
 
-},{"hbsfy/runtime":21}],18:[function(require,module,exports){
+},{"hbsfy/runtime":23}],20:[function(require,module,exports){
 /*jshint eqnull: true */
 
 module.exports.create = function() {
@@ -17714,7 +17858,7 @@ Handlebars.registerHelper('log', function(context, options) {
 return Handlebars;
 };
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 exports.attach = function(Handlebars) {
 
 // BEGIN(BROWSER)
@@ -17822,7 +17966,7 @@ return Handlebars;
 
 };
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 exports.attach = function(Handlebars) {
 
 var toString = Object.prototype.toString;
@@ -17907,7 +18051,7 @@ Handlebars.Utils = {
 return Handlebars;
 };
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var hbsBase = require("handlebars/lib/handlebars/base");
 var hbsUtils = require("handlebars/lib/handlebars/utils");
 var hbsRuntime = require("handlebars/lib/handlebars/runtime");
@@ -17918,5 +18062,5 @@ hbsRuntime.attach(Handlebars);
 
 module.exports = Handlebars;
 
-},{"handlebars/lib/handlebars/base":18,"handlebars/lib/handlebars/runtime":19,"handlebars/lib/handlebars/utils":20}]},{},[4])
+},{"handlebars/lib/handlebars/base":20,"handlebars/lib/handlebars/runtime":21,"handlebars/lib/handlebars/utils":22}]},{},[4])
 ;

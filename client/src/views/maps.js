@@ -8,21 +8,56 @@ var itemView = Marionette.ItemView.extend({
     initialize: function() {
         this.listenTo(this.model, 'change', this.render);
     },
-    //events: {
-    //    'click': 'showDetails'
-    //},
 
     onRender: function(el) {
         // Temporarily add the map to the DOM so that it can be sized properly
         this.$el.addClass('temp-render');
         $('body').append(this.$el);
+
+        console.log('Map Index appended');
+
+        var swLat = parseFloat(this.model.attributes.coordinates.sw.lat);
+        var swLng = parseFloat(this.model.attributes.coordinates.sw.lng);
+        var neLat = parseFloat(this.model.attributes.coordinates.ne.lat);
+        var neLng = parseFloat(this.model.attributes.coordinates.ne.lng);
+
+        var swCoords = new google.maps.LatLng(swLat, swLng);
+        var neCoords = new google.maps.LatLng(neLat, neLng);
+
+        var mapBounds = new google.maps.LatLngBounds(swCoords, neCoords);
+
+        var mapCenter = new google.maps.LatLng(
+            swLat + ((neLat - swLat) / 2),
+            swLng + ((neLng - swLng) / 2)
+        );
         
         var mapOptions = {
-          center: new google.maps.LatLng(el.model.attributes.coordinates.lat, el.model.attributes.coordinates.lng),
-          zoom: 14
+          center: mapCenter,
+          zoom: 1
         };
         var map = new google.maps.Map(this.$el.find(".map-canvas")[0],
             mapOptions);
+
+        map.fitBounds(mapBounds);
+
+        var rectangle = new google.maps.Rectangle();
+
+        var rectOptions = {
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 1,
+          fillColor: '#FFFFFF',
+          fillOpacity: 0,
+          map: map,
+          bounds: mapBounds
+        };
+        rectangle.setOptions(rectOptions);
+
+        google.maps.event.addDomListener(window, 'resize', function() {
+            var center = map.getCenter();
+            google.maps.event.trigger(map, "resize");
+            map.setCenter(center);
+        });
 
         this.$el.remove();
         this.$el.removeClass('temp-render');
@@ -33,11 +68,19 @@ module.exports = CompositeView = Marionette.CompositeView.extend({
     template: require('../../templates/map_index.hbs'),
     tagName: 'div',
     className: 'container',
+    itemView: itemView,
+    itemViewContainer: '.map-index-item-container',
     initialize: function() {
-        this.listenTo(this.collection, 'change', this.render);
+        if (this.collection) {
+            this.listenTo(this.collection, 'change', this.render);
+        }
     },
 
     onRender: function() {
+        if (!this.collection) {
+            console.log('No collection');
+            this.$el.find('.map-index-item-container').append('<div class="col-sm-12"><p>No maps found. <a href="#/map/add">Click here to add one</a></p></div>');
+        }
         var page = window.App.controller.page;
         if (page === '1') {
             this.$el.find('.pagination-btn-group .prev').addClass('disabled');
@@ -51,7 +94,5 @@ module.exports = CompositeView = Marionette.CompositeView.extend({
         } else {
             this.$el.find('.pagination-btn-group .next').attr('href', '#/map/' + (parseInt(page, 10) + 1));
         }
-    },
-    itemView: itemView,
-    itemViewContainer: '.map-index-item-container'
+    }
 });

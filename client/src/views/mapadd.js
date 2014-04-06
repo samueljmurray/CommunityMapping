@@ -16,39 +16,46 @@ module.exports = ItemView = Marionette.ItemView.extend({
         // Suppress normal form submission behaviour
         e.preventDefault();
 
-        var map = {};
-        map.coordinates = {};
+        var map = {
+            coordinates: {
+                sw: {},
+                ne: {}
+            }
+        };
 
         var errors = [];
 
         // Validate name
         if (this.$el.find('form #inputName').val() === "") {
             this.$el.find('form #inputName').parent('.form-group').addClass('has-error');
-            errors.push('Invalid map name.');
+            errors.push('Invalid map name');
         } else {
             this.$el.find('form #inputName').parent('.form-group').removeClass('has-error');
-            map.name = this.$el.find('form #inputName').val();
         }
 
-        // Validate latitude
-        if (isNaN(parseFloat(this.$el.find('form #inputLatitude').val()).toFixed(3))) {
-            this.$el.find('form #inputLatitude').parent('.form-group').addClass('has-error');
-            errors.push('Invalid latitude.');
-        } else {
-            this.$el.find('form #inputLatitude').parent('.form-group').removeClass('has-error');
-            map.coordinates.lat = parseFloat(parseFloat(this.$el.find('form #inputLatitude').val()).toFixed(3));
-        }
-
-        // Validate longitude
-        if (isNaN(parseFloat(this.$el.find('form #inputLongitude').val()).toFixed(3))) {
-            this.$el.find('form #inputLongitude').parent('.form-group').addClass('has-error');
-            errors.push('Invalid longitude.');
-        } else {
-            this.$el.find('form #inputLongitude').parent('.form-group').removeClass('has-error');
-            map.coordinates.lng = parseFloat(parseFloat(this.$el.find('form #inputLongitude').val()).toFixed(3));
-        }
+        // Validate coordinate fields
+        var coordFields = {
+            'inputSWLatitude': 'SW Latitude',
+            'inputSWLongitude': 'SW Longitude',
+            'inputNELatitude': 'NE Latitude',
+            'inputNELongitude': 'NE Longitude'
+        };
+        var that = this;
+        $.each(coordFields, function(fieldName, fieldLabel) {
+            if (isNaN(parseFloat(that.$el.find('form #' + fieldName).val()).toFixed(3))) {
+                that.$el.find('form #' + fieldName).parent('.form-group').addClass('has-error');
+                errors.push('Invalid: ' + fieldLabel);
+            } else {
+                that.$el.find('form #' + fieldName).parent('.form-group').removeClass('has-error');
+            }
+        });
 
         if (errors.length === 0) {
+            map.name = this.$el.find('form #inputName').val();
+            map.coordinates.sw.lat = parseFloat(this.$el.find('form #inputSWLatitude').val());
+            map.coordinates.sw.lng = parseFloat(this.$el.find('form #inputSWLongitude').val());
+            map.coordinates.ne.lat = parseFloat(this.$el.find('form #inputNELatitude').val());
+            map.coordinates.ne.lng = parseFloat(this.$el.find('form #inputNELongitude').val());
             this.addMap(map);
         } else {
             $('.messages').empty();

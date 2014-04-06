@@ -34,7 +34,8 @@ mongoose.connect('mongodb://localhost/CommunityMapping');
 mongoose.connection.on('open', function() {
     utils.log.info("Connected to Mongoose");
 
-    seeder.check();
+    // Seeder not currently designed to work with bounding coordinates
+    // seeder.check();
 });
 
 // Routes

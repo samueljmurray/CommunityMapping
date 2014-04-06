@@ -6,8 +6,14 @@ var Map = new Schema({
     timestamp: { type: Date, 'default': Date.now },
     name: String,
     coordinates: {
-        lat: String,
-        lng: String
+        sw: {
+            lat: String,
+            lng: String
+        },
+        ne: {
+            lat: String,
+            lng: String
+        }
     },
     canvasId: Schema.ObjectId,
     style: String

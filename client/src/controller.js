@@ -4,6 +4,7 @@ var Backbone = require('backbone'),
     NotFoundView = require('./views/notfound'),
     HomeView = require('./views/home'),
     MapsView = require('./views/maps'),
+    MapViewView = require('./views/mapview'),
     MapAddView = require('./views/mapadd');
 
 module.exports = Controller = Marionette.Controller.extend({
@@ -16,8 +17,6 @@ module.exports = Controller = Marionette.Controller.extend({
         this.renderView(view);
     },
     mapIndex: function(page) {
-        console.log('HELLO');
-        console.log(page);
         if (!page || page === "") {
             page = '1';
         }
@@ -29,17 +28,25 @@ module.exports = Controller = Marionette.Controller.extend({
         var end = start + utils.mapIndexLength;
         var maps = new Backbone.Collection(window.App.data.maps.slice(start, end));
 
-        if (maps.length  > 0) {
+        if (maps.length === 0 && page === '1') {
+            view = new MapsView();
+        } else if (maps.length  > 0) {
             view = new MapsView({ collection: maps});
         } else {
             view = new NotFoundView();
         }
         this.renderView(view);
     },
-    mapInteract: function(id) {
-
-    },
     mapView: function(id) {
+        var map = new Backbone.Model(window.App.data.maps.get(id));
+        if (map.id == id) {
+            view = new MapViewView({model: map});
+        } else {
+            view = new NotFoundView();
+        }
+        this.renderView(view);
+    },
+    mapInteract: function(id) {
 
     },
     mapTimeline: function(id) {
