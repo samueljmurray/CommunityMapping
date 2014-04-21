@@ -1,5 +1,4 @@
 # TODO
 
-* How best to acccess a model's attributes in views
-* Map styling
-* Shade out area not covered by bounding box
+* How best to acccess a model's attributes in views (assuming current method isn't ideal)
+* Research and test custom overlays https://developers.google.com/maps/documentation/javascript/customoverlays
