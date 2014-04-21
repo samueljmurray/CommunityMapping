@@ -15,8 +15,7 @@ var Map = new Schema({
             lng: String
         }
     },
-    canvasId: Schema.ObjectId,
-    style: String
+    canvasId: Schema.ObjectId
 });
 
 var Canvas = new Schema({

@@ -13,8 +13,7 @@ var itemView = Marionette.ItemView.extend({
         // Temporarily add the map to the DOM so that it can be sized properly
         this.$el.addClass('temp-render');
         $('body').append(this.$el);
-
-        console.log('Map Index appended');
+        window.mapLastPos = null;
 
         var swLat = parseFloat(this.model.attributes.coordinates.sw.lat);
         var swLng = parseFloat(this.model.attributes.coordinates.sw.lng);
@@ -32,31 +31,42 @@ var itemView = Marionette.ItemView.extend({
         );
         
         var mapOptions = {
-          center: mapCenter,
-          zoom: 1
+            center: mapCenter,
+            zoom: 1,
+            styles: utils.mapStyles,
+            panControl: false,
+            zoomControl: false,
+            mapTypeControl: false,
+            scaleControl: false,
+            streetViewControl: false,
+            overviewMapControl: false
         };
-        var map = new google.maps.Map(this.$el.find(".map-canvas")[0],
-            mapOptions);
+        var map = new google.maps.Map(this.$el.find(".map-canvas")[0], mapOptions);
 
+        // Zoom to bounds
         map.fitBounds(mapBounds);
 
-        var rectangle = new google.maps.Rectangle();
+        // Add map boundary
+        map = utils.addMapBoundary(map, swLat, swLng, neLat, neLng);
 
-        var rectOptions = {
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
-          strokeWeight: 1,
-          fillColor: '#FFFFFF',
-          fillOpacity: 0,
-          map: map,
-          bounds: mapBounds
-        };
-        rectangle.setOptions(rectOptions);
-
+        // Center on window resize
         google.maps.event.addDomListener(window, 'resize', function() {
             var center = map.getCenter();
             google.maps.event.trigger(map, "resize");
             map.setCenter(center);
+        });
+
+        // Store center on mousedown - will revert back to this position if user pans out of bounds
+        google.maps.event.addDomListener(window, 'mousedown', function() {
+            window.mapLastPos = map.getCenter();
+        });
+
+        // Store center on mousedown - will revert back to this position if user pans out of bounds
+        google.maps.event.addDomListener(window, 'mouseup', function() {
+            if (!map.getBounds().intersects(mapBounds) && window.mapLastPos) {
+                map.panTo(window.mapLastPos);
+                window.mapLastPos = null;
+            }
         });
 
         this.$el.remove();

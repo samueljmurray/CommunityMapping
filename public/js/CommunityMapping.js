@@ -17307,18 +17307,129 @@ module.exports = Router = Marionette.AppRouter.extend({
 
 },{}],8:[function(require,module,exports){
 module.exports = {
-	log: {
-		info: function(msg) {
-			console.log('INFO ' + msg);
-		},
-		warn: function(msg) {
-			console.log('WARN ' + msg);
-		},
-		error: function(msg) {
-			console.log('ERROR ' + msg);
-		}
-	},
-	mapIndexLength: 12
+    log: {
+        info: function(msg) {
+            console.log('INFO ' + msg);
+        },
+        warn: function(msg) {
+            console.log('WARN ' + msg);
+        },
+        error: function(msg) {
+            console.log('ERROR ' + msg);
+        }
+    },
+    mapIndexLength: 12,
+    mapStyles: [{
+        "elementType": "labels.icon",
+        "stylers": [
+          { "visibility": "off" }
+        ]
+      },{
+        "featureType": "landscape.man_made",
+        "stylers": [
+          { "visibility": "off" }
+        ]
+      },{
+        "featureType": "poi",
+        "stylers": [
+          { "visibility": "off" }
+        ]
+      },{
+        "elementType": "geometry.fill",
+        "stylers": [
+          { "visibility": "on" },
+          { "color": "#FFFFFF" }
+        ]
+      },{
+        "featureType": "road",
+        "elementType": "geometry.stroke",
+        "stylers": [
+          { "weight": 0.6 }
+        ]
+      },{
+        "featureType": "road",
+        "elementType": "geometry.stroke",
+        "stylers": [
+          { "color": "#808080" }
+        ]
+      },{
+        "elementType": "labels",
+        "stylers": [
+          { "lightness": 25 },
+          { "saturation": -100 }
+        ]
+      },{
+        "featureType": "transit.line",
+        "elementType": "geometry.fill",
+        "stylers": [
+          { "color": "#808080" },
+          { "weight": 0.5 }
+        ]
+      },{
+        "featureType": "transit.station",
+        "stylers": [
+          { "visibility": "off" }
+        ]
+      },{
+        "featureType": "administrative.country",
+        "elementType": "all",
+        "stylers": [
+          { "weight": 0.6 }
+        ]
+      },{
+        "featureType": "administrative.country",
+        "elementType": "all",
+        "stylers": [
+          { "color": "#808080" }
+        ]
+      },{
+        "featureType": "water",
+        "elementType": "geometry.fill",
+        "stylers": [
+          { "color": "#F1F1F6" }
+        ]
+      }],
+    addMapBoundary: function(map, swLat, swLng, neLat, neLng) {
+        var rectOptions = {
+          strokeColor: '#FFFFFF',
+          strokeOpacity: 0,
+          strokeWeight: 0,
+          fillColor: '#444444',
+          fillOpacity: 0.5,
+          bounds: null,
+          map: map,
+        };
+        var swCoords, neCoords, mapBounds;
+        // Add boundary box 1
+        swCoords = new google.maps.LatLng(-90, -180);
+        neCoords = new google.maps.LatLng(swLat, neLng);
+        rectOptions.bounds = new google.maps.LatLngBounds(swCoords, neCoords);
+        var rectangle1 = new google.maps.Rectangle();
+        rectangle1.setOptions(rectOptions);
+
+        // Add boundary box 2
+        swCoords = new google.maps.LatLng(swLat, -180);
+        neCoords = new google.maps.LatLng(90, swLng);
+        rectOptions.bounds = new google.maps.LatLngBounds(swCoords, neCoords);
+        var rectangle2 = new google.maps.Rectangle();
+        rectangle2.setOptions(rectOptions);
+
+        // Add boundary box 3
+        swCoords = new google.maps.LatLng(neLat, swLng);
+        neCoords = new google.maps.LatLng(90, 180);
+        rectOptions.bounds = new google.maps.LatLngBounds(swCoords, neCoords);
+        var rectangle3 = new google.maps.Rectangle();
+        rectangle3.setOptions(rectOptions);
+
+        // Add boundary box 4
+        swCoords = new google.maps.LatLng(-90, neLng);
+        neCoords = new google.maps.LatLng(neLat, 180);
+        rectOptions.bounds = new google.maps.LatLngBounds(swCoords, neCoords);
+        var rectangle4 = new google.maps.Rectangle();
+        rectangle4.setOptions(rectOptions);
+
+        return map;
+    }
 };
 },{}],9:[function(require,module,exports){
 var Marionette = require('backbone.marionette');
@@ -17425,8 +17536,7 @@ var itemView = Marionette.ItemView.extend({
         // Temporarily add the map to the DOM so that it can be sized properly
         this.$el.addClass('temp-render');
         $('body').append(this.$el);
-
-        console.log('Map Index appended');
+        window.mapLastPos = null;
 
         var swLat = parseFloat(this.model.attributes.coordinates.sw.lat);
         var swLng = parseFloat(this.model.attributes.coordinates.sw.lng);
@@ -17444,31 +17554,42 @@ var itemView = Marionette.ItemView.extend({
         );
         
         var mapOptions = {
-          center: mapCenter,
-          zoom: 1
+            center: mapCenter,
+            zoom: 1,
+            styles: utils.mapStyles,
+            panControl: false,
+            zoomControl: false,
+            mapTypeControl: false,
+            scaleControl: false,
+            streetViewControl: false,
+            overviewMapControl: false
         };
-        var map = new google.maps.Map(this.$el.find(".map-canvas")[0],
-            mapOptions);
+        var map = new google.maps.Map(this.$el.find(".map-canvas")[0], mapOptions);
 
+        // Zoom to bounds
         map.fitBounds(mapBounds);
 
-        var rectangle = new google.maps.Rectangle();
+        // Add map boundary
+        map = utils.addMapBoundary(map, swLat, swLng, neLat, neLng);
 
-        var rectOptions = {
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
-          strokeWeight: 1,
-          fillColor: '#FFFFFF',
-          fillOpacity: 0,
-          map: map,
-          bounds: mapBounds
-        };
-        rectangle.setOptions(rectOptions);
-
+        // Center on window resize
         google.maps.event.addDomListener(window, 'resize', function() {
             var center = map.getCenter();
             google.maps.event.trigger(map, "resize");
             map.setCenter(center);
+        });
+
+        // Store center on mousedown - will revert back to this position if user pans out of bounds
+        google.maps.event.addDomListener(window, 'mousedown', function() {
+            window.mapLastPos = map.getCenter();
+        });
+
+        // Store center on mousedown - will revert back to this position if user pans out of bounds
+        google.maps.event.addDomListener(window, 'mouseup', function() {
+            if (!map.getBounds().intersects(mapBounds) && window.mapLastPos) {
+                map.panTo(window.mapLastPos);
+                window.mapLastPos = null;
+            }
         });
 
         this.$el.remove();
@@ -17513,25 +17634,23 @@ var Marionette = require('backbone.marionette'),
     utils = require('../utils');
 
 module.exports = itemView = Marionette.ItemView.extend({
-	template: require('../../templates/map_view.hbs'),
+    template: require('../../templates/map_view.hbs'),
     tagName: 'div',
     className: 'fullscreen-container',
     initialize: function() {
-		// Listening to map model rather than canvas model
-		// Should it re-render the whole view?
-		// Should it even be listening?
-		// What causes the model to change?
-		this.listenTo(this.model, 'change', this.render);
-	},
+        // Listening to map model rather than canvas model
+        // Should it re-render the whole view?
+        // Should it even be listening?
+        // What causes the model to change?
+        this.listenTo(this.model, 'change', this.render);
+    },
 
-	onRender: function() {
-		// Temporarily add the map to the DOM so that it can be sized properly
+    onRender: function() {
+        // Temporarily add the map to the DOM so that it can be sized properly
         this.$el.addClass('temp-render');
         this.$el.css('width','inherit');
-        console.log($('body'));
         $('body').append(this.$el);
-
-        console.log('Map View appended');
+        window.mapLastPos = null;
 
         var swLat = parseFloat(this.model.attributes.attributes.coordinates.sw.lat);
         var swLng = parseFloat(this.model.attributes.attributes.coordinates.sw.lng);
@@ -17549,36 +17668,55 @@ module.exports = itemView = Marionette.ItemView.extend({
         );
         
         var mapOptions = {
-          center: mapCenter,
-          zoom: 1
+            center: mapCenter,
+            zoom: 1,
+            styles: utils.mapStyles,
+            panControl: false,
+            zoomControl: false,
+            mapTypeControl: false,
+            scaleControl: false,
+            streetViewControl: false,
+            overviewMapControl: false
         };
         var map = new google.maps.Map(this.$el.find(".map-canvas")[0],
             mapOptions);
 
+        // Zoom to bounds
         map.fitBounds(mapBounds);
 
-        var rectangle = new google.maps.Rectangle();
+        zoomChangeBoundsListener = google.maps.event.addListenerOnce(map, 'bounds_changed', function(event) {
+            if (this.getZoom()){
+                mapOptions.minZoom = this.getZoom();
+                map.setOptions(mapOptions);
+            }
+        });
 
-        var rectOptions = {
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
-          strokeWeight: 1,
-          fillColor: '#FFFFFF',
-          fillOpacity: 0,
-          map: map,
-          bounds: mapBounds
-        };
-        rectangle.setOptions(rectOptions);
+        // Add map boundary
+        map = utils.addMapBoundary(map, swLat, swLng, neLat, neLng);
 
-		google.maps.event.addDomListener(window, 'resize', function() {
-			var center = map.getCenter();
-			google.maps.event.trigger(map, 'resize');
-			map.setCenter(center);
-		});
+        // Center on window resize
+        google.maps.event.addDomListener(window, 'resize', function() {
+            var center = map.getCenter();
+            google.maps.event.trigger(map, 'resize');
+            map.setCenter(center);
+        });
+
+        // Store center on mousedown - will revert back to this position if user pans out of bounds
+        google.maps.event.addDomListener(window, 'mousedown', function() {
+            window.mapLastPos = map.getCenter();
+        });
+
+        // Store center on mousedown - will revert back to this position if user pans out of bounds
+        google.maps.event.addDomListener(window, 'mouseup', function() {
+            if (!map.getBounds().intersects(mapBounds) && window.mapLastPos) {
+                map.panTo(window.mapLastPos);
+                window.mapLastPos = null;
+            }
+        });
 
         this.$el.remove();
         this.$el.removeClass('temp-render');
-	}
+    }
 });
 },{"../../templates/map_view.hbs":18,"../utils":8}],13:[function(require,module,exports){
 var Marionette = require('backbone.marionette');
@@ -17597,7 +17735,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"admin-container\">\n	<h1 id=\"logo\">Community Mapping</h1>\n	<div class=\"btn-group\">\n    	<a href=\"#/map\" class=\"btn btn-default\" role=\"button\">Maps</a>\n    </div>\n	<h2>API</h2>\n		<h3>Map</h3>\n		<dl>\n			<dt><strong>(GET) Index:</strong> Get all maps</dt>\n			<dd class=\"code\">/api/map/index</dd>\n\n			<dt><strong>(GET) Get by ID:</strong> Get a single map by its ID number</dt>\n			<dd class=\"code\">/api/map/&lt;<em>id</em>&gt;</dd>\n		</dl>\n\n		<h3>Canvas</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single canvas by its ID number</dt>\n			<dd class=\"code\">/api/canvas/&lt;<em>id</em>&gt;</dd>\n		</dl>\n\n		<h3>Shape</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single shape by its ID number</dt>\n			<dd class=\"code\">/api/shape/&lt;<em>id</em>&gt;</dd>\n\n			<dt><strong>(GET) Get by timerange:</strong> Get all shapes created between a given timerange</dt>\n			<dd class=\"code\">/api/shape/timerange/&lt;<em>start</em>&gt;/&lt;<em>end</em>&gt;/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(POST) Add:</strong> Add a shape</dt>\n			<dd class=\"code\">/api/shape</dd>\n		</dl>\n\n		<h3>Story</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single story by its ID number</dt>\n			<dd class=\"code\">/api/story/&lt;<em>id</em>&gt;</dd>\n\n			<dt><strong>(GET) Get by spacerange:</strong> Get all stories with coordinates between a given range</dt>\n			<dd class=\"code\">/api/story/spacerange/&lt;<em>lat1</em>&gt;/&lt;<em>lng1</em>&gt;/&lt;<em>lat2</em>&gt;/&lt;<em>lng2</em>&gt;/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(POST) Add:</strong> Add a story</dt>\n			<dd class=\"code\">/api/story</dd>\n		</dl>\n		<div class=\"bs-callout bs-callout-danger\">Hello</div>\n</div>";
+  return "<div class=\"admin-container\">\n	<h1 id=\"logo\">Community Mapping</h1>\n	<div class=\"btn-group\">\n    	<a href=\"#/map\" class=\"btn btn-default\" role=\"button\">Maps</a>\n    </div>\n	<h2>API</h2>\n		<h3>Map</h3>\n		<dl>\n			<dt><strong>(GET) Index:</strong> Get all maps</dt>\n			<dd class=\"code\">/api/map/index</dd>\n\n			<dt><strong>(GET) Get by ID:</strong> Get a single map by its ID number</dt>\n			<dd class=\"code\">/api/map/&lt;<em>id</em>&gt;</dd>\n		</dl>\n\n		<h3>Canvas</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single canvas by its ID number</dt>\n			<dd class=\"code\">/api/canvas/&lt;<em>id</em>&gt;</dd>\n		</dl>\n\n		<h3>Shape</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single shape by its ID number</dt>\n			<dd class=\"code\">/api/shape/&lt;<em>id</em>&gt;</dd>\n\n			<dt><strong>(GET) Get by timerange:</strong> Get all shapes created between a given timerange</dt>\n			<dd class=\"code\">/api/shape/timerange/&lt;<em>start</em>&gt;/&lt;<em>end</em>&gt;/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(POST) Add:</strong> Add a shape</dt>\n			<dd class=\"code\">/api/shape</dd>\n		</dl>\n\n		<h3>Story</h3>\n		<dl>\n			<dt><strong>(GET) Get by ID:</strong> Get a single story by its ID number</dt>\n			<dd class=\"code\">/api/story/&lt;<em>id</em>&gt;</dd>\n\n			<dt><strong>(GET) Get by spacerange:</strong> Get all stories with coordinates between a given range</dt>\n			<dd class=\"code\">/api/story/spacerange/&lt;<em>lat1</em>&gt;/&lt;<em>lng1</em>&gt;/&lt;<em>lat2</em>&gt;/&lt;<em>lng2</em>&gt;/&lt;<em>page</em>&gt;[/&lt;<em>max</em>&gt;]</dd>\n\n			<dt><strong>(POST) Add:</strong> Add a story</dt>\n			<dd class=\"code\">/api/story</dd>\n		</dl>\n</div>";
   });
 
 },{"hbsfy/runtime":23}],15:[function(require,module,exports){
