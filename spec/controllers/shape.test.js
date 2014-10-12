@@ -1,4 +1,11 @@
 /* jshint -W030 */
+/**
+ * shape.test.js
+ *
+ * Test specification for the Express app map view controller
+ */
+
+ /* Includes */
 var proxyquire = require('proxyquire'),
     modelsStub = {},
     shape = proxyquire('../../controllers/shape', {
@@ -8,6 +15,7 @@ var proxyquire = require('proxyquire'),
 var res = {},
 	req = {};
 
+/* Tests */
 describe('Shape Controller', function() {
 
 	// Setup
@@ -80,6 +88,7 @@ describe('Shape Controller', function() {
 
 	});
 
+	// Get by time range
 	describe('getByTimerange', function() {
 
 		beforeEach(function() {
@@ -104,6 +113,7 @@ describe('Shape Controller', function() {
 
 	});
 
+	// Add
 	describe('add', function() {
 
 		beforeEach(function() {

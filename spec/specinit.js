@@ -1,3 +1,10 @@
+/**
+ * specinit.js
+ *
+ * Intialize test harness
+ */
+
+/* Includes */
 var chai = require('chai'),
     sinonChai = require("sinon-chai");
 

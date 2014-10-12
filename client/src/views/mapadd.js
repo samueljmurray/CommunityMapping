@@ -1,7 +1,15 @@
+/**
+ * mapadd.js
+ *
+ * Map Add view
+ */
+
+/* Exports */
 var Marionette = require('backbone.marionette'),
     utils = require('../utils'),
     canvasModel = require('../models/canvas');
 
+/* Exports */
 module.exports = ItemView = Marionette.ItemView.extend({
     template: require('../../templates/map_add.hbs'),
     tagName: 'div',
@@ -12,6 +20,7 @@ module.exports = ItemView = Marionette.ItemView.extend({
         'click .back': 'back'
     },
 
+    // Form validation
     validateField: function(e) {
         // Suppress normal form submission behaviour
         e.preventDefault();
@@ -50,6 +59,7 @@ module.exports = ItemView = Marionette.ItemView.extend({
             }
         });
 
+        // If there are no errors, continue with form processing
         if (errors.length === 0) {
             map.name = this.$el.find('form #inputName').val();
             map.coordinates.sw.lat = parseFloat(this.$el.find('form #inputSWLatitude').val());
@@ -57,11 +67,14 @@ module.exports = ItemView = Marionette.ItemView.extend({
             map.coordinates.ne.lat = parseFloat(this.$el.find('form #inputNELatitude').val());
             map.coordinates.ne.lng = parseFloat(this.$el.find('form #inputNELongitude').val());
             this.addMap(map);
+        // If there are form errors, display them to the user
         } else {
             $('.messages').empty();
             $('.messages').append('<div class="alert alert-danger">' + errors.join('<BR/>') + '</div>');
         }
     },
+
+    // Send request for new map addition to API
     addMap: function(map) {
         var canvas = new canvasModel();
         canvas.save(null, {success: function(model, response) {
@@ -73,9 +86,13 @@ module.exports = ItemView = Marionette.ItemView.extend({
             $('.messages').append('<div class="alert alert-success">Map <strong>' + map.attributes.name + '</strong> added successfully.</div>');
         }});
     },
+
+    // Route user to map index view
     toMaps: function() {
         window.App.router.navigate('#/map');
     },
+
+    // Route user back one page
     back: function() {
         window.history.back();
     }

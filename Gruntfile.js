@@ -94,6 +94,7 @@ module.exports = function(grunt) {
             'build/<%= pkg.name %>.js': ['build/vendor.js', 'build/app.js']
         },
 
+        // Copy files to deployment locations
         copy: {
             dev: {
                 files: [{
@@ -146,7 +147,7 @@ module.exports = function(grunt) {
             }
         },
 
-        // for changes to the front-end code
+        // Watch for changes to the front-end code
         watch: {
             scripts: {
                 files: ['client/templates/*.hbs', 'client/src/**/*.js'],
@@ -166,7 +167,7 @@ module.exports = function(grunt) {
             }
         },
 
-        // for changes to the node code
+        // Watch for changes to the node code
         nodemon: {
             dev: {
                 options: {
@@ -180,7 +181,7 @@ module.exports = function(grunt) {
             }
         },
 
-        // server tests
+        // Express app tests
         simplemocha: {
             options: {
                 globals: ['expect', 'sinon'],
@@ -195,7 +196,7 @@ module.exports = function(grunt) {
             }
         },
 
-        // mongod server launcher
+        // Mongod server launcher
         shell: {
             mongo: {
                 command: 'mongod',
@@ -220,7 +221,7 @@ module.exports = function(grunt) {
             }
         },
 
-        // for front-end tdd
+        // Client app tests
         karma: {
             options: {
                 configFile: 'karma.conf.js'
@@ -234,6 +235,7 @@ module.exports = function(grunt) {
             }
         },
 
+        // JS linting
         jshint: {
             all: ['Gruntfile.js', 'client/src/**/*.js', 'client/spec/**/*.js'],
             dev: ['client/src/**/*.js'],

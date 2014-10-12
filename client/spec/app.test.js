@@ -1,6 +1,14 @@
+/**
+ * app.test.js
+ *
+ * Test specification for the client app
+ */
+
+/* Includes */
 var App = require('../src/app.js'),
     Marionette = require('backbone.marionette');
 
+/* Tests */
 describe('App', function() {
     var app = new App();
     it('should have a start function', function() {

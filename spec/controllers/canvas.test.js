@@ -1,4 +1,11 @@
 /* jshint -W030 */
+/**
+ * canvas.test.js
+ *
+ * Test specification for the Express app canvas view controller
+ */
+
+ /* Includes */
 var proxyquire = require('proxyquire'),
     modelsStub = {},
     canvas = proxyquire('../../controllers/canvas', {

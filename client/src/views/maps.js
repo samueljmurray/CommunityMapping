@@ -1,6 +1,14 @@
+/**
+ * maps.js
+ *
+ * Map view
+ */
+
+/* Includes */
 var Marionette = require('backbone.marionette'),
     utils = require('../utils');
 
+// View for a single item on the page
 var itemView = Marionette.ItemView.extend({
     template: require('../../templates/map_small.hbs'),
     tagName: 'div',
@@ -11,8 +19,12 @@ var itemView = Marionette.ItemView.extend({
 
     onRender: function(el) {
         // Temporarily add the map to the DOM so that it can be sized properly
+        // If the element isn't on the DOM when the resizing takes place,
+        // it won't be able to interrogate the element's sizing in relation to 
+        // the viewport, so will render incorrectly
         this.$el.addClass('temp-render');
         $('body').append(this.$el);
+
         window.mapLastPos = null;
 
         var swLat = parseFloat(this.model.attributes.coordinates.sw.lat);
@@ -30,6 +42,7 @@ var itemView = Marionette.ItemView.extend({
             swLng + ((neLng - swLng) / 2)
         );
         
+        // Set map options
         var mapOptions = {
             center: mapCenter,
             zoom: 1,
@@ -41,6 +54,7 @@ var itemView = Marionette.ItemView.extend({
             streetViewControl: false,
             overviewMapControl: false
         };
+        // Intialize Google Map
         var map = new google.maps.Map(this.$el.find(".map-canvas")[0], mapOptions);
 
         // Zoom to bounds
@@ -69,11 +83,14 @@ var itemView = Marionette.ItemView.extend({
             }
         });
 
+        // Remove the element from the DOM after having been resized properly
+        // It will be re-added by the controller (renderView method)
         this.$el.remove();
         this.$el.removeClass('temp-render');
     }
 });
 
+/* Exports */
 module.exports = CompositeView = Marionette.CompositeView.extend({
     template: require('../../templates/map_index.hbs'),
     tagName: 'div',
@@ -82,22 +99,27 @@ module.exports = CompositeView = Marionette.CompositeView.extend({
     itemViewContainer: '.map-index-item-container',
     initialize: function() {
         if (this.collection) {
+            // Re-render the view if the data changes
             this.listenTo(this.collection, 'change', this.render);
         }
     },
 
     onRender: function() {
+        // If there are no maps defined in the DB
         if (!this.collection) {
-            console.log('No collection');
             this.$el.find('.map-index-item-container').append('<div class="col-sm-12"><p>No maps found. <a href="#/map/add">Click here to add one</a></p></div>');
         }
+
+        // Set behaviour for 'previous' button
         var page = window.App.controller.page;
+
         if (page === '1') {
             this.$el.find('.pagination-btn-group .prev').addClass('disabled');
         } else {
             this.$el.find('.pagination-btn-group .prev').attr('href', '#/map/' + (parseInt(page, 10) - 1));
         }
 
+        // Set behaviour for 'next' button
         var remaining = window.App.data.maps.length - (page * utils.mapIndexLength);
         if (remaining < 1) {
             this.$el.find('.pagination-btn-group .next').addClass('disabled');

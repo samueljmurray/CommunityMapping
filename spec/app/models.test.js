@@ -1,8 +1,17 @@
 /* jshint -W030 */
+/**
+ * models.test.js
+ *
+ * Test specification for the Express app models
+ */
+
+/* Includes */
 var models = require('../../app/models');
 
+/* Tests */
 describe('Models', function() {
 
+    // Map model
     describe('Map', function() {
         var schema = models.Map.schema.paths;
 
@@ -42,6 +51,7 @@ describe('Models', function() {
         });
     });
 
+    // Canvas model
     describe('Canvas', function() {
         var schema = models.Canvas.schema.paths;
 
@@ -66,6 +76,7 @@ describe('Models', function() {
 
     });
 
+    // Shape model
     describe('Shape', function() {
         var schema = models.Shape.schema.paths;
 
@@ -92,6 +103,7 @@ describe('Models', function() {
 
     });
 
+    // Story model
     describe('Story', function() {
         var schema = models.Story.schema.paths;
 

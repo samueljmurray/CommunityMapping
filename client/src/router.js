@@ -1,5 +1,13 @@
+/**
+ * router.js
+ *
+ * Maps URL routes to views
+ */
+
+/* Includes */
 var Marionette = require('backbone.marionette');
 
+/* Exports */
 module.exports = Router = Marionette.AppRouter.extend({
     appRoutes: {
         ''  : 'home',

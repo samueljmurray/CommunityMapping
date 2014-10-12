@@ -10,13 +10,11 @@ Curator => The organiser of an exhibition, who will have control over the large-
 
 ## Overview
 
-A platform that allows ehibition visitors to take part in creating a map of a given area. Visitors will use touch-screen kiosks to explore a map and styli to draw onto the map.
+A platform that allows exhibition visitors to take part in creating a map of the local area. Visitors will use touch-screen kiosks to explore a map and styli to draw onto the map.
 
-Visitors may also place pins on the map and attach short pieces of text to the pins.
+Visitors may also place pins on the map and attach short pieces of text (stories) to the pins.
 
 A projector or large screen will also be present in the exhibition area showing an overview of the map, updated in real-time as visitors add to it. This view of the map will also display an animated timeline of how the map has built up over the course of the exhibition.
-
-
 
 The map and the map timeline will also be accessible via the web, meaning that visitors don't need to be present in the exhibition space to see that map and read the pin stories
 

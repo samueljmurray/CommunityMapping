@@ -1,4 +1,11 @@
 /* jshint -W030 */
+/**
+ * map.test.js
+ *
+ * Test specification for the Express app map view controller
+ */
+
+/* Includes */
 var proxyquire = require('proxyquire'),
     modelsStub = {},
     map = proxyquire('../../controllers/map', {
@@ -8,6 +15,7 @@ var proxyquire = require('proxyquire'),
 var res = {},
 	req = {};
 
+/* Tests */
 describe('Map Controller', function() {
 
 	// Setup

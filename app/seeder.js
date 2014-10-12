@@ -1,10 +1,29 @@
+/**
+ * seeder.js
+ *
+ * Seeds the MongoDB database with example data
+ * The seeder is only run if there is no DB content when the app starts
+ * @TODO Modify to support bounding coodinates
+ */
+
+/* Includes */
 var mongoose = require('mongoose'),
     models = require('./models'),
     utils = require('../utils');
 
+/* Exports */
 module.exports = {
+
+    /**
+     * Checks to see whether DB needs to be seeded and carries out seeding if necessary
+     * @return {null}
+     */
     check: function() {
+
+        // Read DB for all maps
         models.Map.find({}, function(err, maps) {
+
+            // If there are no maps, insert seed data
             if (maps.length === 0) {
                 utils.log.info('Seeding database...')
 

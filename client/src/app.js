@@ -1,3 +1,10 @@
+/**
+ * app.js
+ *
+ * Client app
+ */
+
+/* Includes */
 var Marionette = require('backbone.marionette'),
 	utils = require('./utils'),
     Controller = require('./controller'),
@@ -5,12 +12,16 @@ var Marionette = require('backbone.marionette'),
     MapModel = require('./models/map'),
     MapCollection = require('./collections/maps');
 
-// Define and export App
+/* Exports */
 module.exports = App = function App() {};
 
+// Define app
 App.prototype.start = function() {
+
+    // App is a Marionette application
 	App.core = new Marionette.Application();
 
+    // initialize:before event handler
 	App.core.on("initialize:before", function (options) {
         utils.log.info('App: Initializing');
 
@@ -28,8 +39,11 @@ App.prototype.start = function() {
 
     });
 
+    // app:start event handler
     App.core.vent.bind('app:start', function(options){
         utils.log.info('App: Starting');
+
+        // Initialize backbone browser history control
         if (Backbone.history) {
             App.controller = new Controller();
             App.router = new Router({ controller: App.controller });
@@ -39,7 +53,6 @@ App.prototype.start = function() {
             utils.log.error('Backbone.history not defined');
         }
 
-        //new up and views and render for base app here...
         utils.log.info('App: Done starting and running!');
     });
 
